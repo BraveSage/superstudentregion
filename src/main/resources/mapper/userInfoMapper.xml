@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.superstudentregion.mapper.UserInfoMapper">
+
+    <sql id="allCol">
+        user_id,
+        user_name,
+        password,
+        sex,
+        school,
+        major,
+        avatar_path,
+        email,
+        tel,
+        role,
+        qq_OpenId,
+        wechat_OpenId,
+        signature,
+        state_flag,
+        del_flag
+    </sql>
+    <select id="selectAll" resultType="com.superstudentregion.bean.UserInfo">
+        select
+        <include refid="allCol" />
+        from
+        user_info
+        where
+        state_flag = 1
+    </select>
+
+    <!--查看个人信息-->
+    <select id="selectInfoById" resultType="UserInfo" parameterType="Integer">
+        select
+        <include refid="allCol" />
+        from
+        user_info
+        where
+        user_id = #{userId}
+    </select>
+
+    <!--用户注册-->
+    <insert id="insertUser" parameterType="UserInfo" useGeneratedKeys ="true" keyProperty="userId">
+        insert into
+        user_info
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="userName!=null">
+                user_name,
+            </if>
+            <if test="password!=null">
+                password,
+            </if>
+            <if test="sex!=null">
+                sex,
+            </if>
+            <if test="school!=null">
+                school,
+            </if>
+            <if test="major!=null">
+                major,
+            </if>
+            <if test="avatarPath!=null">
+                avatar_path,
+            </if>
+            <if test="email!=null">
+                email,
+            </if>
+            <if test="tel!=null">
+                tel,
+            </if>
+            <if test="role!=null">
+                role,
+            </if>
+            <if test="qqOpenId != null and qqOpenId!=''">
+                qq_OpenId,
+            </if>
+            <if test="wechatOpenId != null and wechatOpenId!=''">
+                wechat_OpenId,
+            </if>
+            <if test="stateFlag!=null">
+                state_flag,
+            </if>
+            <if test="delFlag!=null">
+                del_flag
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="userName!=null">
+                #{userName},
+            </if>
+            <if test="password!=null">
+                #{password},
+            </if>
+            <if test="sex!=null">
+                #{sex},
+            </if>
+            <if test="school!=null">
+                #{school},
+            </if>
+            <if test="major!=null">
+                #{major},
+            </if>
+            <if test="avatarPath!=null">
+                #{avatarPath},
+            </if>
+            <if test="email!=null">
+                #{email},
+            </if>
+            <if test="tel!=null">
+                #{tel},
+            </if>
+            <if test="role!=null">
+                #{role},
+            </if>
+            <if test="qqOpenId != null">
+                #{qqOpenId},
+            </if>
+            <if test="wechatOpenId != null">
+                #{wechatOpenId},
+            </if>
+            <if test="stateFlag!=null">
+                #{stateFlag},
+            </if>
+            <if test="delFlag!=null">
+                del_flag
+            </if>
+        </trim>
+    </insert>
+
+    <!--登录-->
+    <select id="loginUser" parameterType="userInfo" resultType="userInfo">
+        select
+        <include refid="allCol" />
+        from
+        user_info
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="userName!=null and userName!=''">
+                user_name = #{userName}
+            </if>
+            <if test="email!=null and email!=''">
+                and email = #{email}
+            </if>
+            and del_flag = 0
+        </trim>
+    </select>
+
+    <!-- 是否存在邮箱 -->
+    <select id="ifExistEmail" parameterType="java.lang.String" resultType="UserInfo">
+        select
+        <include refid="allCol" />
+        from
+        user_info
+        where
+        email = #{email}
+        and
+        del_flag = 0
+    </select>
+
+    <!--是否存在账号-->
+    <select id="ifExistUserName" parameterType="java.lang.String" resultType="UserInfo">
+        select
+        <include refid="allCol" />
+        from
+        user_info
+        where
+        user_name = #{userName}
+        and
+        del_flag = 0
+    </select>
+
+
+    <!--更新个人信息-->
+    <update id="updateInfo" parameterType="UserInfo">
+        update
+        user_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="password!=null and password!=''">
+                password = #{password},
+            </if>
+            <if test="email!=null and email!= ''">
+                email = #{email},
+            </if>
+            <if test="tel!=null and tel!=''">
+                tel = #{tel},
+            </if>
+            <if test="sex!=null">
+                sex = #{sex},
+            </if>
+            <if test="school!=null and school!=''">
+                school = #{school},
+            </if>
+            <if test="major!=null and major!=''">
+                major = #{major},
+            </if>
+            <if test="avatarPath!=null and avatarPath!=''">
+                avatar_path = #{avatarPath},
+            </if>
+            <if test="signature!=null">
+                signature = #{signature},
+            </if>
+            <if test="role!=null and role!=0">
+                role = #{role},
+            </if>
+            <if test="stateFlag!=null">
+                state_flag = #{stateFlag},
+            </if>
+            <if test="qqOpenId != null">
+                qq_OpenId = #{qqOpenId},
+            </if>
+            <if test="wechatOpenId != null">
+                wechat_OpenId = #{wechatOpenId},
+            </if>
+            <if test="userName!=null and userName!=''">
+                user_name = #{userName}
+            </if>
+        </trim>
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="userId!=null and userId!=0">
+                user_id = #{userId}
+            </if>
+        </trim>
+    </update>
+
+    <update id="updatePwd" parameterType="UserInfo">
+        update
+          user_info
+        set
+          password = #{password}
+        where
+          email = #{email}
+        and
+          del_flag = 0;
+    </update>
+
+
+    <insert id="insertQQUser" parameterType="BasicUserInfo">
+        insert into qq_user_info
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="openId != null and openId != ''">
+                open_id,
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name,
+            </if>
+            <if test="avatarPath != null and avatarPath != ''">
+                avatar_path,
+            </if>
+            <if test="nickname != null and nickname != ''">
+                nickname,
+            </if>
+            <if test="sex != null and sex != ''">
+                sex,
+            </if>
+            expired_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="openId != null and openId != ''">
+                #{openId},
+            </if>
+            <if test="userName != null and userName != ''">
+                #{userName},
+            </if>
+            <if test="avatarPath != null and avatarPath != ''">
+                #{avatarPath},
+            </if>
+            <if test="nickname != null and nickname != ''">
+                #{nickname},
+            </if>
+            <if test="sex != null and sex != ''">
+                #{sex},
+            </if>
+            NOW()
+        </trim>
+    </insert>
+
+    <insert id="insertWechatUser" parameterType="BasicUserInfo">
+        insert into wechat_user_info
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="openId != null and openId != ''">
+                open_id,
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name,
+            </if>
+            <if test="avatarPath != null and avatarPath != ''">
+                avatar_path,
+            </if>
+            <if test="sex != null and sex != ''">
+                sex,
+            </if>
+            expired_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="openId != null and openId != ''">
+                #{openId},
+            </if>
+            <if test="userName != null and userName != ''">
+                #{userName},
+            </if>
+            <if test="avatarPath != null and avatarPath != ''">
+                #{avatarPath},
+            </if>
+            <if test="sex != null and sex != ''">
+                #{sex},
+            </if>
+            NOW()
+        </trim>
+    </insert>
+
+    <select id="selectInfoByQQOpenid" parameterType="String" resultType="BasicUserInfo">
+        select
+        id,
+        user_name,
+        avatar_path,
+        nickname,
+        user_id,
+        open_id,
+        sex
+        from
+        qq_user_info
+        <where>
+            <if test="openId != null and openId!= ''">
+                open_id = #{openId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectInfoByWechatOpenid" parameterType="String" resultType="BasicUserInfo">
+        select
+        id,
+        user_name,
+        avatar_path,
+        nickname,
+        user_id,
+        open_id,
+        sex
+        from
+        wechat_user_info
+        <where>
+            <if test="openId != null and openId!= ''">
+                open_id = #{openId}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateQQUserInfo" parameterType="BasicUserInfo">
+        update
+        qq_user_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="avatarPath!=null and avatarPath!=''">
+                avatar_path = #{avatarPath},
+            </if>
+            <if test="sex!=null and sex!= 0">
+                sex = #{sex},
+            </if>
+            <if test="nickname!=null and nickname!= ''">
+                nickname = #{nickname},
+            </if>
+            <if test="userId!=null and userId!= 0">
+                user_id = #{userId},
+            </if>
+        </trim>
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="openId!=null and openId!=''">
+                open_id = #{openId}
+            </if>
+        </trim>
+    </update>
+
+    <update id="updateWechatInfo" parameterType="BasicUserInfo">
+        update
+        qq_user_info
+        <trim prefix="set" suffixOverrides=",">
+            <if test="avatarPath!=null and avatarPath!=''">
+                avatar_path = #{avatarPath},
+            </if>
+            <if test="sex!=null and sex!= 0">
+                sex = #{sex},
+            </if>
+            <if test="nickname!=null and nickname!= ''">
+                nickname = #{nickname},
+            </if>
+            <if test="userId!=null and userId!= 0">
+                user_id = #{userId},
+            </if>
+        </trim>
+        <trim prefix="WHERE" prefixOverrides="AND">
+            <if test="openId!=null and openId!=''">
+                open_id = #{openId}
+            </if>
+        </trim>
+    </update>
+</mapper>
