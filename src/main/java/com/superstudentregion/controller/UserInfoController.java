@@ -12,10 +12,7 @@ import com.superstudentregion.service.UserInfoService;
 import com.superstudentregion.service.impl.RedisClientSingle;
 import com.superstudentregion.stuenum.StateEnum;
 import com.superstudentregion.stuenum.ThirdPartyType;
-import com.superstudentregion.util.CurrentTimeUtil;
-import com.superstudentregion.util.GenerateLinkUtil;
-import com.superstudentregion.util.Result;
-import com.superstudentregion.util.TokenUtils;
+import com.superstudentregion.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,7 +34,7 @@ public class UserInfoController {
 //    @Autowired
 //    CurrentUserUtil currentUserUtil;
     @Autowired
-UserInfoMapper userInfoMapper;
+    UserInfoMapper userInfoMapper;
 
     public UserInfoController() {
     }
@@ -66,7 +63,7 @@ UserInfoMapper userInfoMapper;
     public Result login(String input, String password) {
         UserInfo userInfo = new UserInfo();
         if (!StringUtils.isBlank(input)) {
-            if (input.matches("^\\w+((-\\w+)|(\\.\\w+))*\\@[A-Za-z0-9]+((\\.|-)[A-Za-z0-9]+)*\\.[A-Za-z0-9]+$")) {
+            if (input.matches(UserRegex.EMAIL_REGEX)) {
                 userInfo.setEmail(input);
             } else {
                 userInfo.setUserName(input);
@@ -130,6 +127,7 @@ UserInfoMapper userInfoMapper;
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(userId);
         this.userInfoService.updateAvatar(userInfo, avatar);
+        this.redisClient.del(new String[]{RedisConstant.USER_INFO_PREFIX + userInfo.getUserId()});
         return Result.success("修改头像成功");
     }
 

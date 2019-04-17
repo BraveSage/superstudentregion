@@ -38,22 +38,38 @@ public class ArticleServiceImpl implements ArticleService {
         //判断用户的权限
         this.userAuthority(articleInfo.getUserId());
         //获取文件名称
-        String htmlFileName = articleByHtml.getOriginalFilename();
-        String xmlFileName = articleByXml.getOriginalFilename();
-        //设置文章存储路径
-        String htmlFilePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + htmlFileName;
-        String xmlFilePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + "xml/" + xmlFileName;
-        File uploadHtmlFile = new File(htmlFilePath);
-        File uploadXmlFile = new File(xmlFilePath);
-        uploadFile(articleByHtml, uploadHtmlFile);
-        uploadFile(articleByXml, uploadXmlFile);
-        //设置存入文件服务器的映射路径
-        String htmlArticlePath =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + htmlFileName;
-        String xmlArticlePath =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + xmlFileName;
+//        String htmlFileName = articleByHtml.getOriginalFilename();
+//        String xmlFileName = articleByXml.getOriginalFilename();
+//        //设置文章存储路径
+//        String htmlFilePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + htmlFileName;
+//        String xmlFilePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + "xml/" + xmlFileName;
+//        File uploadHtmlFile = new File(htmlFilePath);
+//        File uploadXmlFile = new File(xmlFilePath);
+//        uploadFile(articleByHtml, uploadHtmlFile);
+//        uploadFile(articleByXml, uploadXmlFile);
+//        //设置存入文件服务器的映射路径
+//        String htmlArticlePath =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + htmlFileName;
+//        String xmlArticlePath =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "xml/" + xmlFileName;
+        String htmlArticlePath = this.optionFile(articleByHtml, "html", articleInfo);
+        String xmlArticlePath = this.optionFile(articleByXml, "xml", articleInfo);
         articleInfo.setArticleHtmlPath(htmlArticlePath);
         articleInfo.setArticleXmlPath(xmlArticlePath);
         int i = this.articleMapper.insertArticle(articleInfo);
         return i;
+    }
+
+    //操作文件的同时返回文章映射路径
+    public String optionFile(MultipartFile file, String type, ArticleInfo articleInfo){
+        //获取文件名称
+        String fileName = file.getOriginalFilename();
+        //设置文章存储路径
+        String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + fileName;
+        //上传文件
+        File uploadFile = new File(filePath);
+        uploadFile(file, uploadFile);
+        //返回文章映射路径
+        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + fileName;
+        return articlePath;
     }
 
     @Transactional
@@ -109,8 +125,8 @@ public class ArticleServiceImpl implements ArticleService {
         MultipartFile[] var4 = pictures;
         int var5 = pictures.length;
 
-        for(int var6 = 0; var6 < var5; ++var6) {
-            MultipartFile picture = var4[var6];
+        for(int i = 0; i < var5; ++i) {
+            MultipartFile picture = var4[i];
             String picturePath = uploadPic(picture, userId);
             list.add(picturePath);
         }

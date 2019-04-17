@@ -3,6 +3,7 @@ package com.superstudentregion.service.impl;
 import com.superstudentregion.bean.BasicUserInfo;
 import com.superstudentregion.bean.UserInfo;
 import com.superstudentregion.bean.UserInfoManager;
+import com.superstudentregion.constant.Constants;
 import com.superstudentregion.constant.RedisConstant;
 import com.superstudentregion.constant.TokenConstant;
 import com.superstudentregion.exception.UserException;
@@ -44,32 +45,33 @@ public class UserInfoServiceImpl implements UserInfoService {
     public void updatePwd(String email) {
         Object pwd = this.redisTemplate.get(email);
         if (pwd.equals((Object)null)) {
-            throw new UserException(500, "该链接已经过期，请重新发送邮件");
+            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该链接已经过期，请重新发送邮件");
         } else {
             UserInfo userInfo = new UserInfo();
             userInfo.setEmail(email);
             userInfo.setPassword(pwd.toString());
             int i = this.userInfoMapper.updatePwd(userInfo);
             if (i == 0) {
-                throw new UserException(500, "修改密码失败");
+                throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "修改密码失败");
             }
+            this.redisTemplate.del(RedisConstant.USER_INFO_PREFIX + userInfo.getUserId());
         }
     }
 
     public void forgetPwd(String email, String password) {
         UserInfo userInfo = this.userInfoMapper.ifExistEmail(email);
         if (userInfo == null) {
-            throw new UserException(500, "用户邮箱不存在");
+            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "用户邮箱不存在");
         } else if (password.length() >= 6 && password.length() <= 16) {
             Long ttl = this.redisTemplate.ttl(email);
             if (ttl < 0L) {
                 SendMail.forgetPwd(email);
                 this.redisTemplate.set(email, password, 600L);
             } else {
-                throw new UserException(500, "密码修改确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
+                throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "密码修改确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
             }
         } else {
-            throw new UserException(500, "密码设置不符合6-16位的要求");
+            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "密码设置不符合6-16位的要求");
         }
     }
 
@@ -94,8 +96,9 @@ public class UserInfoServiceImpl implements UserInfoService {
                 ExamineUtil.examinExistEmail(userInfo1.getStateFlag());
             }
         }
-
-        return this.userInfoMapper.updateInfo(userInfo);
+        int i = this.userInfoMapper.updateInfo(userInfo);
+        this.redisTemplate.del(RedisConstant.USER_INFO_PREFIX + userInfo.getUserId());
+        return i;
     }
 
     @Transactional
@@ -112,19 +115,19 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if (userInfo1.getStateFlag().equals(StateEnum.ACTIVE.getValue())) {
                     if (this.redisTemplate.get(userEmail + 1) != null) {
                         Long ttl = this.redisTemplate.ttl(userEmail);
-                        throw new UserException(500, "邮箱注册确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
+                        throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "邮箱注册确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
                     } else {
                         this.redisTemplate.set(userEmail + 1, "nondue", 600L);
                         SendMail.registerCode(userInfo);
                         throw new UserException(0, "已经重新发送激活邮件，请进入邮箱激活用户");
                     }
                 } else {
-                    throw new UserException(500, "该邮箱账号已经被注册, 您可以去登录或者更换邮箱账号");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该邮箱账号已经被注册, 您可以去登录或者更换邮箱账号");
                 }
             } else {
                 UserInfo userInfo2 = this.userInfoMapper.ifExistUserName(userName);
                 if (userInfo2 != null) {
-                    throw new UserException(500, "该用户名已经被使用, 请更换");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该用户名已经被使用, 请更换");
                 } else {
                     userInfo.setStateFlag(StateEnum.ACTIVE.getValue());
                     int i = this.userInfoMapper.insertUser(userInfo);
@@ -149,11 +152,12 @@ public class UserInfoServiceImpl implements UserInfoService {
             avatar.transferTo(uploadFile);
             uploadFile.createNewFile();
             userInfo.setAvatarPath(avatarPath);
-            this.userInfoMapper.updateInfo(userInfo);
-            return 0;
+            int i = this.userInfoMapper.updateInfo(userInfo);
+//            this.redisTemplate.del(RedisConstant.USER_INFO_PREFIX + userInfo.getUserId());
+            return i;
         } catch (IOException var7) {
             this.log.error("上传文件失败", var7);
-            throw new UserException(500, "更换头像失败");
+            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "更换头像失败");
         }
     }
 
@@ -172,7 +176,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 basicUserInfo.setUserName(userName);
                 i = this.userInfoMapper.insertQQUser(basicUserInfo);
                 if (i < 1) {
-                    throw new UserException(500, "创建QQ用户失败");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "创建QQ用户失败");
                 } else {
                     basicUserInfo.setLoginType(ThirdPartyType.QQ_TYPE.getValue());
                     manager.setQqUserInfo(basicUserInfo);
@@ -203,7 +207,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 basicUserInfo.setUserName(userName);
                 i = this.userInfoMapper.insertWechatUser(basicUserInfo);
                 if (i < 1) {
-                    throw new UserException(500, "创建微信用户失败");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "创建微信用户失败");
                 } else {
                     basicUserInfo.setLoginType(ThirdPartyType.WECHAT_TYPE.getValue());
                     manager.setWechatUserInfo(basicUserInfo);
@@ -247,13 +251,13 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userInfo.setQqOpenId(openId);
                 userInfo.setUserId(info.getUserId());
                 if (!info.getPassword().equals(password)) {
-                    throw new UserException(500, "邮箱账号和密码不匹配");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "邮箱账号和密码不匹配");
                 } else {
                     i = this.userInfoMapper.updateInfo(userInfo);
                     qqInfo.setUserId(userInfo.getUserId());
                     i2 = this.userInfoMapper.updateQQUserInfo(qqInfo);
                     if (i != 1 && i2 != 1) {
-                        throw new UserException(500, "绑定邮箱失败");
+                        throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "绑定邮箱失败");
                     } else {
                         info.setQqUserInfo(qqInfo);
                         return info;
@@ -270,7 +274,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 qqInfo.setUserId(userInfo.getUserId());
                 i2 = this.userInfoMapper.updateQQUserInfo(qqInfo);
                 if (i != 1 && i2 != 1) {
-                    throw new UserException(500, "绑定邮箱失败");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "绑定邮箱失败");
                 } else {
                     token = TokenUtils.generateToken(userInfo.getUserId(), email);
                     userInfo.setUserToken(token);
@@ -287,14 +291,14 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
 
                 if (!info.getPassword().equals(password)) {
-                    throw new UserException(500, "邮箱账号和密码不匹配");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "邮箱账号和密码不匹配");
                 } else {
                     userInfo.setWechatOpenId(openId);
                     userInfo.setUserId(info.getUserId());
                     i = this.userInfoMapper.updateInfo(info);
                     i2 = this.userInfoMapper.updateWechatInfo(wechatInfo);
                     if (i != 1 && i2 != 1) {
-                        throw new UserException(500, "绑定邮箱失败");
+                        throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "绑定邮箱失败");
                     } else {
                         info.setWechatUserInfo(wechatInfo);
                         return info;
@@ -310,7 +314,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 i = this.insertUser(userInfo);
                 i2 = this.userInfoMapper.updateWechatInfo(wechatInfo);
                 if (i != 1 && i2 != 1) {
-                    throw new UserException(500, "绑定邮箱失败");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "绑定邮箱失败");
                 } else {
                     token = TokenUtils.generateToken(userInfo.getUserId(), email);
                     this.redisTemplate.set(TokenConstant.TOKEN_USER_PREFIX + userInfo.getUserId(), token);
@@ -320,7 +324,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 }
             }
         } else {
-            throw new UserException(500, "传入的绑定类型是错误的");
+            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "传入的绑定类型是错误的");
         }
     }
 
@@ -339,7 +343,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 this.userInfoMapper.insertQQUser(basicUserInfo);
             } else {
                 if (wechatUserInfo.getUserId() != null) {
-                    throw new UserException(500, "该用户已经绑定了邮箱");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该用户已经绑定了邮箱");
                 }
 
                 this.userInfoMapper.updateQQUserInfo(basicUserInfo);
@@ -356,7 +360,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 this.userInfoMapper.updateWechatInfo(basicUserInfo);
             } else {
                 if (wechatUserInfo.getUserId() != null) {
-                    throw new UserException(500, "该用户已经绑定了邮箱");
+                    throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该用户已经绑定了邮箱");
                 }
 
                 this.userInfoMapper.updateWechatInfo(basicUserInfo);
@@ -374,31 +378,31 @@ public class UserInfoServiceImpl implements UserInfoService {
                 if (openId.equals(info.getQqOpenId())) {
                     ttl = this.redisTemplate.ttl(info.getEmail() + 1);
                     if (ttl != -1L) {
-                        throw new UserException(500, "邮箱注册确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
+                        throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "邮箱注册确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
                     }
 
                     SendMail.registerCode(info);
                     throw new UserException(0, "邮件已经发送，请点击激活该账户来进行绑定该邮箱账户");
                 }
 
-                throw new UserException(500, "该邮箱已经被绑定，且处于未激活状态，请填写其他邮箱");
+                throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该邮箱已经被绑定，且处于未激活状态，请填写其他邮箱");
             }
 
             if (loginType.equals(ThirdPartyType.WECHAT_TYPE.getValue())) {
                 if (openId.equals(info.getWechatOpenId())) {
                     ttl = this.redisTemplate.ttl(info.getEmail() + 1);
                     if (ttl != -1L) {
-                        throw new UserException(500, "邮箱注册确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
+                        throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "邮箱注册确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
                     }
 
                     SendMail.registerCode(info);
                     throw new UserException(0, "邮件已经发送，请点击激活该账户来进行绑定该邮箱账户");
                 }
 
-                throw new UserException(500, "该邮箱已经被绑定，且处于未激活状态，请填写其他邮箱");
+                throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该邮箱已经被绑定，且处于未激活状态，请填写其他邮箱");
             }
         } else if (info.getStateFlag().equals(StateEnum.FROZEN.getValue())) {
-            throw new UserException(500, "该邮箱处于冻结状态，请填写其他邮箱-");
+            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该邮箱处于冻结状态，请填写其他邮箱-");
         }
 
     }
