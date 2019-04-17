@@ -1,6 +1,7 @@
 package com.superstudentregion.controller;
 
 import com.superstudentregion.bean.ArticleInfo;
+import com.superstudentregion.constant.Constants;
 import com.superstudentregion.service.ArticleService;
 import com.superstudentregion.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class ArticleController {
     )
     public Result insertArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByXml) {
         int i = this.articleService.insertArticle(articleInfo, articleByHtml, articleByXml);
-        return i == 0 ? Result.failure(500, "创建文章失败") : Result.success("添加文章成功");
+        return i == 0 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "创建文章失败") : Result.success("添加文章成功");
     }
 
     @RequestMapping(
@@ -35,7 +36,7 @@ public class ArticleController {
     )
     public Result updateArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByXml) {
         int i = this.articleService.updateArticle(articleInfo, articleByHtml,articleByXml);
-        return i == 0 ? Result.failure(500, "修改文章失败") : Result.success("修改文章成功");
+        return i == 0 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "修改文章失败") : Result.success("修改文章成功");
     }
 
     @RequestMapping(
@@ -46,7 +47,7 @@ public class ArticleController {
         ArticleInfo info = new ArticleInfo();
         info.setArticleId(articleId);
         int i = this.articleService.deleteArticle(info);
-        return i != 1 ? Result.failure(500, "修改文章失败") : Result.success("删除文章成功");
+        return i != 1 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "修改文章失败") : Result.success("删除文章成功");
     }
 
     @RequestMapping(

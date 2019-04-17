@@ -3,6 +3,7 @@ package com.superstudentregion.controller;
 import com.superstudentregion.bean.BasicUserInfo;
 import com.superstudentregion.bean.UserInfo;
 import com.superstudentregion.bean.UserInfoManager;
+import com.superstudentregion.constant.Constants;
 import com.superstudentregion.constant.RedisConstant;
 import com.superstudentregion.constant.TokenConstant;
 import com.superstudentregion.exception.UserException;
@@ -51,7 +52,7 @@ UserInfoMapper userInfoMapper;
         userInfo = this.userInfoService.loginUser(userInfo);
         String rToken = (String)this.redisClient.get(TokenConstant.TOKEN_USER_PREFIX + userInfo.getUserId());
         if (!TokenUtils.isTokenValid(rToken, token)) {
-            Result.failure(500, "登录失败");
+            Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "登录失败");
         }
 
         userInfo.setUserToken(rToken);
@@ -71,12 +72,12 @@ UserInfoMapper userInfoMapper;
                 userInfo.setUserName(input);
             }
         } else {
-            Result.failure(500, "输入的邮箱/账号不能为空");
+            Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "输入的邮箱/账号不能为空");
         }
 
         UserInfo user = this.userInfoService.loginUser(userInfo);
         if (user == null) {
-            return Result.failure(500, "您输入的账号不存在, 请重新输入");
+            return Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "您输入的账号不存在, 请重新输入");
         } else if (!user.getStateFlag().equals(StateEnum.ACTIVE.getValue()) && user.getStateFlag() != StateEnum.ACTIVE.getValue()) {
             if (!user.getStateFlag().equals(StateEnum.FROZEN.getValue()) && user.getStateFlag() != StateEnum.FROZEN.getValue()) {
                 if (!password.equals(user.getPassword())) {
@@ -102,10 +103,10 @@ UserInfoMapper userInfoMapper;
                     return Result.success("登录成功", manager);
                 }
             } else {
-                return Result.failure(500, "用:该账号已被冻结, 无法登陆");
+                return Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "用:该账号已被冻结, 无法登陆");
             }
         } else {
-            return Result.failure(500, "账号还未激活, 请单击激活邮件中的激活链接激活账号");
+            return Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "账号还未激活, 请单击激活邮件中的激活链接激活账号");
         }
     }
 
@@ -139,7 +140,7 @@ UserInfoMapper userInfoMapper;
     public Result changeUserInfo(@Valid UserInfo userInfo) {
         UserInfo info = this.userInfoMapper.ifExistUserName(userInfo.getUserName());
         if (info != null) {
-            return Result.failure(500, "账号已存在");
+            return Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "账号已存在");
         } else {
             this.userInfoService.updateInfo(userInfo);
             this.redisClient.del(new String[]{RedisConstant.USER_INFO_PREFIX + userInfo.getUserId()});
@@ -208,7 +209,7 @@ UserInfoMapper userInfoMapper;
     )
     public Result thirdPartyLogin(BasicUserInfo userInfo) {
         UserInfoManager manager = this.userInfoService.insertThirdParty(userInfo);
-        return manager == null ? Result.failure(500, "登录失败") : Result.success("登录成功", manager);
+        return manager == null ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "登录失败") : Result.success("登录成功", manager);
     }
 
     @RequestMapping(
