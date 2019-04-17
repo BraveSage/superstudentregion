@@ -152,8 +152,8 @@ public class ArticleServiceImpl implements ArticleService {
         try {
             article.transferTo(uploadFile);
             uploadFile.createNewFile();
-        } catch (IOException var3) {
-            log.error("上传文章失败", var3);
+        } catch (IOException e) {
+            log.error("上传文章失败", e);
             throw new ArticleException("上传文章失败");
         }
     }
