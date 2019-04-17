@@ -44,7 +44,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     public void updatePwd(String email) {
         Object pwd = this.redisTemplate.get(email);
-        if (pwd.equals((Object)null)) {
+        if (pwd.equals(null)) {
             throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该链接已经过期，请重新发送邮件");
         } else {
             UserInfo userInfo = new UserInfo();
@@ -155,8 +155,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             int i = this.userInfoMapper.updateInfo(userInfo);
 //            this.redisTemplate.del(RedisConstant.USER_INFO_PREFIX + userInfo.getUserId());
             return i;
-        } catch (IOException var7) {
-            this.log.error("上传文件失败", var7);
+        } catch (IOException e) {
+            this.log.error("上传文件失败", e);
             throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "更换头像失败");
         }
     }

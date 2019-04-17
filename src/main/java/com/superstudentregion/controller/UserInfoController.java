@@ -19,13 +19,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-@Controller
-@RequestMapping({"/user"})
+@RestController
+@RequestMapping(value = "/user")
 public class UserInfoController {
     @Autowired
     RedisClientSingle redisClient;
@@ -40,8 +41,8 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/autoLogin"},
-            method = {RequestMethod.POST}
+            value = "/autoLogin",
+            method = RequestMethod.POST
     )
     public Result autoLogin(String userName, String token) {
         UserInfo userInfo = new UserInfo();
@@ -57,8 +58,8 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/login"},
-            method = {RequestMethod.POST}
+            value = "/login",
+            method = RequestMethod.POST
     )
     public Result login(String input, String password) {
         UserInfo userInfo = new UserInfo();
@@ -108,8 +109,8 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/register"},
-            method = {RequestMethod.POST}
+            value = "/register",
+            method = RequestMethod.POST
     )
     public Result register(@RequestParam("password") String password, @RequestParam("email") String email) {
         UserInfo userInfo = new UserInfo();
@@ -120,20 +121,20 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/changeAvatar"},
-            method = {RequestMethod.POST}
+            value = "/changeAvatar",
+            method = RequestMethod.POST
     )
     public Result changeAvatar(MultipartFile avatar, Integer userId) {
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(userId);
         this.userInfoService.updateAvatar(userInfo, avatar);
-        this.redisClient.del(new String[]{RedisConstant.USER_INFO_PREFIX + userInfo.getUserId()});
+        this.redisClient.del(RedisConstant.USER_INFO_PREFIX + userInfo.getUserId());
         return Result.success("修改头像成功");
     }
 
     @RequestMapping(
-            value = {"/changeUserInfo"},
-            method = {RequestMethod.POST}
+            value = "/changeUserInfo",
+            method = RequestMethod.POST
     )
     public Result changeUserInfo(@Valid UserInfo userInfo) {
         UserInfo info = this.userInfoMapper.ifExistUserName(userInfo.getUserName());
@@ -141,14 +142,13 @@ public class UserInfoController {
             return Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "账号已存在");
         } else {
             this.userInfoService.updateInfo(userInfo);
-            this.redisClient.del(new String[]{RedisConstant.USER_INFO_PREFIX + userInfo.getUserId()});
             return Result.success("修改信息成功");
         }
     }
 
     @RequestMapping(
-            value = {"/displayInfo"},
-            method = {RequestMethod.POST}
+            value = "/displayInfo",
+            method = RequestMethod.POST
     )
     public Result displayInfo(@Valid UserInfo userInfo) {
         Integer userId = userInfo.getUserId();
@@ -158,8 +158,8 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/active"},
-            method = {RequestMethod.GET}
+            value = "/active",
+            method = RequestMethod.GET
     )
     public String activeAccount(HttpServletRequest request) {
         String parameter = request.getParameter(GenerateLinkUtil.getSendTimeKey());
@@ -183,7 +183,7 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/forgetPwd"},
+            value = "/forgetPwd",
             method = {RequestMethod.POST}
     )
     public Result forgetPassword(String email, String password) {
@@ -192,7 +192,7 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/alterPwd"},
+            value = "/alterPwd",
             method = {RequestMethod.GET}
     )
     public Result alterPassword(HttpServletRequest request) {
@@ -202,7 +202,7 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/thirdPartyLogin"},
+            value = "/thirdPartyLogin",
             method = {RequestMethod.POST}
     )
     public Result thirdPartyLogin(BasicUserInfo userInfo) {
@@ -211,8 +211,8 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/bindUser0"},
-            method = {RequestMethod.POST}
+            value = "/bindUser0",
+            method = RequestMethod.POST
     )
     public Result bindUser0(String email, Integer loginType) {
         UserInfo info = this.userInfoMapper.ifExistEmail(email);
@@ -239,8 +239,8 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/bindUser"},
-            method = {RequestMethod.POST}
+            value = "/bindUser",
+            method = RequestMethod.POST
     )
     public Result bindUser(String openId, Integer loginType, String email, String password) {
         UserInfo userInfo = this.userInfoService.bindEmail(openId, loginType, email, password);
@@ -248,8 +248,8 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"/bindThirdParty"},
-            method = {RequestMethod.POST}
+            value = "/bindThirdParty",
+            method = RequestMethod.POST
     )
     public Result bindThird(BasicUserInfo basicUserInfo, Integer userId) {
         this.userInfoService.bindThirtyParty(basicUserInfo, userId);
@@ -257,10 +257,15 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = {"getArticleImage"},
-            method = {RequestMethod.POST}
+            value = "getArticleImage",
+            method = RequestMethod.POST
     )
     public Result getImage(MultipartFile articleImage) {
         return null;
+    }
+
+    @RequestMapping(value = "/hello", method = RequestMethod.GET)
+    public String hello(){
+        return "hello";
     }
 }

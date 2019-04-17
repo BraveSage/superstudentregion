@@ -2,6 +2,7 @@ package com.superstudentregion.service.impl;
 
 import com.superstudentregion.bean.ArticleInfo;
 import com.superstudentregion.bean.UserInfo;
+import com.superstudentregion.constant.Constants;
 import com.superstudentregion.constant.FilePath;
 import com.superstudentregion.exception.ArticleException;
 import com.superstudentregion.exception.UserException;
@@ -147,16 +148,16 @@ public class ArticleServiceImpl implements ArticleService {
             picture.transferTo(uploadFile);
             uploadFile.createNewFile();
             return articlePath;
-        } catch (IOException var6) {
-            log.error("上传文章图片失败失败", var6);
-            throw new UserException(500, "上传文章图片失败失败");
+        } catch (IOException e) {
+            log.error("上传文章图片失败失败", e);
+            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "上传文章图片失败失败");
         }
     }
 
     void userAuthority(Integer userId) {
         UserInfo userInfo = this.userInfoService.selectInfoById(userId);
         if (!userInfo.getStateFlag().equals(StateEnum.NORMAL.getValue())) {
-            throw new UserException(500, "该用户处于未激活状态或冻结状态，因此无法进行操作");
+            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "该用户处于未激活状态或冻结状态，因此无法进行操作");
         }
     }
 
