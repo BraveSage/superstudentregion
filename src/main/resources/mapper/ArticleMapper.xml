@@ -7,7 +7,7 @@
         article_title,
         submit_time,
         article_html_path,
-        article_xml_path,
+        article_md_path,
         like_count,
         unlike_count,
         release_time,
@@ -27,6 +27,9 @@
         user_id = #{userId}
         and
         del_flag = 0
+        order by
+        release_time
+        desc
     </select>
 
     <select id="selectArticleById" parameterType="Integer" resultType="ArticleInfo">
@@ -87,33 +90,33 @@
             <if test="articleHtmlPath!=null and articleHtmlPath!=''">
                 article_html_path,
             </if>
-            <if test="articleXmlPath!=null and articleXmlPath!=''">
-                article_xml_path,
+            <if test="articleMdPath!=null and articleMdPath!=''">
+                article_md_path,
             </if>
             <if test="typeId != null">
                 type_id,
             </if>
             submit_time,
-            release_time
+            release_time,
             read_permission,
             state_flag,
             del_flag
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides="," >
             <if test="userId!=null">
-                user_id = #{userId},
+                #{userId},
             </if>
             <if test="articleTitle!=null and articleTitle!=''">
-                article_title = #{articleTitle},
+                 #{articleTitle},
             </if>
             <if test="articleHtmlPath!=null and articleHtmlPath!=''">
-                article_html_path = #{articleHtmlPath},
+                #{articleHtmlPath},
             </if>
-            <if test="articleXmlPath!=null and articleXmlPath!=''">
-                article_xml_path = #{articleXmlPath},
+            <if test="articleMdPath!=null and articleMdPath!=''">
+                 #{articleMdPath},
             </if>
             <if test="typeId != null">
-                type_id = #{typeId},
+                 #{typeId},
             </if>
             now(),
             now(),

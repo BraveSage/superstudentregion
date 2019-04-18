@@ -25,8 +25,8 @@ public class ArticleController {
             value = {"/createArticle"},
             method = {RequestMethod.POST}
     )
-    public Result insertArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByXml) {
-        int i = this.articleService.insertArticle(articleInfo, articleByHtml, articleByXml);
+    public Result insertArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByMd) {
+        int i = this.articleService.insertArticle(articleInfo, articleByHtml, articleByMd);
         return i == 0 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "创建文章失败") : Result.success("添加文章成功");
     }
 
@@ -34,8 +34,8 @@ public class ArticleController {
             value = {"/modifyArticle"},
             method = {RequestMethod.POST}
     )
-    public Result updateArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByXml) {
-        int i = this.articleService.updateArticle(articleInfo, articleByHtml,articleByXml);
+    public Result updateArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByMd) {
+        int i = this.articleService.updateArticle(articleInfo, articleByHtml,articleByMd);
         return i == 0 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "修改文章失败") : Result.success("修改文章成功");
     }
 

@@ -8,7 +8,7 @@ public class ArticleInfo {
     private String articleTitle;
     private Date submitTime;
     private String articleHtmlPath;
-    private String articleXmlPath;
+    private String articleMdPath;
     private Integer likeCount;
     private Integer collectionCount;
     private Integer readPermission;
@@ -99,12 +99,12 @@ public class ArticleInfo {
         this.articleHtmlPath = articleHtmlPath;
     }
 
-    public String getArticleXmlPath() {
-        return this.articleXmlPath;
+    public String getArticleMdPath() {
+        return articleMdPath;
     }
 
-    public void setArticleXmlPath(String articleXmlPath) {
-        this.articleXmlPath = articleXmlPath;
+    public void setArticleMdPath(String articleMdPath) {
+        this.articleMdPath = articleMdPath;
     }
 
     public Integer getLikeCount() {
@@ -115,7 +115,21 @@ public class ArticleInfo {
         this.likeCount = likeCount;
     }
 
+    @Override
     public String toString() {
-        return "ArticleInfo{articleId=" + this.articleId + ", userId=" + this.userId + ", articleTitle='" + this.articleTitle + '\'' + ", submitTime=" + this.submitTime + ", articleHtmlPath='" + this.articleHtmlPath + '\'' + ", articleXmlPath='" + this.articleXmlPath + '\'' + ", likeCount=" + this.likeCount + ", collectionCount=" + this.collectionCount + ", readPermission=" + this.readPermission + ", typeId=" + this.typeId + ", delFlag=" + this.delFlag + ", stateFlag=" + this.stateFlag + '}';
+        return "ArticleInfo{" +
+                "articleId=" + articleId +
+                ", userId=" + userId +
+                ", articleTitle='" + articleTitle + '\'' +
+                ", submitTime=" + submitTime +
+                ", articleHtmlPath='" + articleHtmlPath + '\'' +
+                ", articleMdPath='" + articleMdPath + '\'' +
+                ", likeCount=" + likeCount +
+                ", collectionCount=" + collectionCount +
+                ", readPermission=" + readPermission +
+                ", typeId=" + typeId +
+                ", delFlag=" + delFlag +
+                ", stateFlag=" + stateFlag +
+                '}';
     }
 }

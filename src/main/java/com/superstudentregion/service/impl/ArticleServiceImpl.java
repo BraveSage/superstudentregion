@@ -51,10 +51,11 @@ public class ArticleServiceImpl implements ArticleService {
 //        //设置存入文件服务器的映射路径
 //        String htmlArticlePath =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + htmlFileName;
 //        String xmlArticlePath =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "xml/" + xmlFileName;
+
         String htmlArticlePath = this.optionFile(articleByHtml, "html", articleInfo);
-        String xmlArticlePath = this.optionFile(articleByXml, "xml", articleInfo);
+        String xmlArticlePath = this.optionFile(articleByXml, "md", articleInfo);
         articleInfo.setArticleHtmlPath(htmlArticlePath);
-        articleInfo.setArticleXmlPath(xmlArticlePath);
+        articleInfo.setArticleMdPath(xmlArticlePath);
         int i = this.articleMapper.insertArticle(articleInfo);
         return i;
     }
