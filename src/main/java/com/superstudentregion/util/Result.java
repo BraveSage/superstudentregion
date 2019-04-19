@@ -1,6 +1,7 @@
 package com.superstudentregion.util;
 
 import com.github.pagehelper.PageInfo;
+import com.superstudentregion.constant.FilePath;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,5 +87,11 @@ public class Result<T> {
 
     public void setErrData(Object errData) {
         this.errData = errData;
+    }
+
+    public static void main(String[] args) {
+        String s = "http://193.112.79.70/sturegion/user/article/1/html/hhh.html".replaceAll(FilePath.ARTICLE_PATH_PREFIX,"");
+        String s1 = FilePath.ARTICLE_FILE_PATH_PREFIX + s;
+        System.out.printf(s1);
     }
 }

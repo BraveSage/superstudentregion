@@ -263,15 +263,11 @@ public class UserInfoController {
     }
 
     @RequestMapping(
-            value = "getArticleImage",
+            value = "/getArticleImage",
             method = RequestMethod.POST
     )
     public Result getImage(MultipartFile articleImage) {
         return null;
     }
 
-    @RequestMapping(value = "/hello", method = RequestMethod.GET)
-    public String hello(){
-        return "hello";
-    }
 }

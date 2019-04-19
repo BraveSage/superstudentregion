@@ -12,4 +12,6 @@ public interface ArticleMapper {
     List<ArticleInfo> selectAllArticleByUser(Integer var1);
 
     ArticleInfo selectArticleById(Integer var1);
+
+    int deleteArticleById(Integer articleId);
 }

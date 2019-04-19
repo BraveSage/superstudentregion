@@ -43,6 +43,14 @@
         del_flag = 0
     </select>
 
+    <delete id="deleteArticleById" parameterType="Integer">
+        delete
+        from
+            article_info
+        where
+            article_id = #{articleId}
+    </delete>
+
     <update id="updateArticle" parameterType="ArticleInfo">
         update
         article_info

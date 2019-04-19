@@ -12,16 +12,16 @@ public interface ArticleService {
 
     int updateArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByXml);
 
-    int updateArticle(ArticleInfo var1);
+    int updateArticle(ArticleInfo articleInfo);
 
-    void likeArticle(Integer var1);
+    void likeArticle(Integer articleId);
 
-    ArticleInfo browseArticle(Integer var1);
+    ArticleInfo browseArticle(Integer articleId);
 
-    int deleteArticle(ArticleInfo var1);
+    int deleteArticle(ArticleInfo articleInfo);
 
-    List<ArticleInfo> allArticleByUser(Integer var1);
+    List<ArticleInfo> allArticleByUser(Integer userId);
 
-    List<String> uploadArticlePic(MultipartFile[] var1, Integer var2);
+    List<String> uploadArticlePic(MultipartFile[] pictures, Integer userId);
 
 }

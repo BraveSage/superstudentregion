@@ -46,7 +46,7 @@ public class ArticleController {
     }
 
     @RequestMapping(
-            value = {"/modifyArticle"},
+            value = {"/modifyArticle/{userId}/{articleId}"},
             method = {RequestMethod.POST}
     )
     public Result updateArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByMd) {
@@ -62,7 +62,7 @@ public class ArticleController {
         ArticleInfo info = new ArticleInfo();
         info.setArticleId(articleId);
         int i = this.articleService.deleteArticle(info);
-        return i != 1 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "修改文章失败") : Result.success("删除文章成功");
+        return i != 1 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "删除文章失败") : Result.success("删除文章成功");
     }
 
     @RequestMapping(
@@ -90,5 +90,18 @@ public class ArticleController {
     public Result browseArticle(Integer articleId) {
         ArticleInfo articleInfo = this.articleService.browseArticle(articleId);
         return Result.success("返回文章信息成功", articleInfo);
+    }
+
+    @RequestMapping(value = "{userId}/modifyReadPermission")
+    public Result updateReadPermission(Integer userId, Integer articleId,Integer readPermission){
+        ArticleInfo articleInfo = new ArticleInfo();
+        if (articleId != null) {
+            articleInfo.setArticleId(articleId);
+        }
+        articleInfo.setUserId(userId);
+        articleInfo.setReadPermission(readPermission);
+        int i = articleService.updateArticle(articleInfo);
+
+        return i!=0? Result.success("修改阅读权限成功"): Result.success("修改阅读权限失败");
     }
 }

@@ -76,30 +76,59 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Transactional
     public int deleteArticle(ArticleInfo articleInfo) {
-        return 0;
+        String articleHtmlPath = articleInfo.getArticleHtmlPath();
+        String articleMdPath = articleInfo.getArticleMdPath();
+        String articleFileHtmlPath = replaceFileName(articleHtmlPath);
+        String articleFileMdPath = replaceFileName(articleMdPath);
+
+        int i = articleMapper.deleteArticleById(articleInfo.getArticleId());
+        deleteFile(articleFileHtmlPath);
+        deleteFile(articleFileMdPath);
+        return i;
     }
 
-    @Transactional
-    public int updateArticle(ArticleInfo articleInfo,MultipartFile articleByHtml, MultipartFile articleByXml) {
-        try {
-            //判断用户权限
-            this.userAuthority(articleInfo.getUserId());
+    public String replaceFileName(String filePath){
+        return FilePath .ARTICLE_FILE_PATH_PREFIX + filePath.replaceAll(FilePath.ARTICLE_PATH_PREFIX, "");
+    }
 
-            String fileNameByHtml = articleByHtml.getOriginalFilename();
-            String filePathByHtml =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + fileNameByHtml;
-            File uploadFile = new File(filePathByHtml);
-            articleByHtml.transferTo(uploadFile);
-            int i = this.updateArticle(articleInfo);
-            return i;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return 0;
+    public static boolean deleteFile(String fileName) {
+        File file = new File(fileName);
+        // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+        if (file.exists() && file.isFile()) {
+            if (file.delete()) {
+//                System.out.println("删除单个文件" + fileName + "成功！");
+                return true;
+            } else {
+                throw new ArticleException("删除文章失败");
+            }
+        } else {
+            throw new ArticleException("删除文章失败，文件不存在");
         }
     }
 
     @Transactional
-    public int updateArticle(ArticleInfo articleInfo) {
+    public int updateArticle(ArticleInfo articleInfo,MultipartFile articleByHtml, MultipartFile articleByXml) {
+        //判断用户权限
+        this.userAuthority(articleInfo.getUserId());
+
+        //获取文章所有信息
+//            ArticleInfo article = browseArticle(articleInfo.getArticleId());
+
+//            String fileNameByHtml = articleByHtml.getOriginalFilename();
+//            String filePathByHtml =FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + fileNameByHtml;
+//            File uploadFile = new File(filePathByHtml);
+//            articleByHtml.transferTo(uploadFile);
+
+        optionFile(articleByHtml,"html",articleInfo);
+        optionFile(articleByXml,"xml",articleInfo);
         articleInfo.setSubmitTime(new Date());
+        int i = this.updateArticle(articleInfo);
+        return i;
+    }
+
+    @Transactional
+    public int updateArticle(ArticleInfo articleInfo) {
+
         int i = this.articleMapper.updateArticle(articleInfo);
         return i;
     }
@@ -126,10 +155,10 @@ public class ArticleServiceImpl implements ArticleService {
         List<String> list = new ArrayList();
         MultipartFile[] var4 = pictures;
         int var5 = pictures.length;
-
+        String picturePath;
         for(int i = 0; i < var5; ++i) {
             MultipartFile picture = var4[i];
-            String picturePath = uploadPic(picture, userId);
+            picturePath = uploadPic(picture, userId);
             list.add(picturePath);
         }
 
@@ -139,7 +168,7 @@ public class ArticleServiceImpl implements ArticleService {
     private static String uploadPic(MultipartFile picture, Integer userId) {
         try {
             String fileName = picture.getOriginalFilename();
-            String filePath = FilePath.ARTICLE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
+            String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
             String articlePath =FilePath.ARTICLE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
             File uploadFile = new File(filePath);
             if (!uploadFile.getParentFile().exists()) {
