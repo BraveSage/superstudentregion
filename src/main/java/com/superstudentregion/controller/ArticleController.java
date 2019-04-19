@@ -4,6 +4,7 @@ import com.superstudentregion.bean.ArticleInfo;
 import com.superstudentregion.constant.Constants;
 import com.superstudentregion.constant.TokenConstant;
 import com.superstudentregion.exception.ArticleException;
+import com.superstudentregion.mapper.ArticleMapper;
 import com.superstudentregion.service.ArticleService;
 import com.superstudentregion.service.impl.RedisClientSingle;
 import com.superstudentregion.util.Result;
@@ -20,6 +21,9 @@ import java.util.List;
 public class ArticleController {
     @Autowired
     ArticleService articleService;
+
+    @Autowired
+    ArticleMapper articleMapper;
 
     @Autowired
     RedisClientSingle redisClient;
@@ -59,9 +63,8 @@ public class ArticleController {
             method = {RequestMethod.POST}
     )
     public Result deleteArticle(Integer articleId) {
-        ArticleInfo info = new ArticleInfo();
-        info.setArticleId(articleId);
-        int i = this.articleService.deleteArticle(info);
+        ArticleInfo articleInfo = articleMapper.selectArticleById(articleId);
+        int i = this.articleService.deleteArticle(articleInfo);
         return i != 1 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "删除文章失败") : Result.success("删除文章成功");
     }
 
@@ -92,7 +95,7 @@ public class ArticleController {
         return Result.success("返回文章信息成功", articleInfo);
     }
 
-    @RequestMapping(value = "{userId}/modifyReadPermission")
+    @RequestMapping(value = "{userId}/modifyReadPermission",method = RequestMethod.POST)
     public Result updateReadPermission(Integer userId, Integer articleId,Integer readPermission){
         ArticleInfo articleInfo = new ArticleInfo();
         if (articleId != null) {

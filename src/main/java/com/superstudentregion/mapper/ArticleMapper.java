@@ -5,13 +5,13 @@ import com.superstudentregion.bean.ArticleInfo;
 import java.util.List;
 
 public interface ArticleMapper {
-    int insertArticle(ArticleInfo var1);
+    int insertArticle(ArticleInfo articleInfo);
 
-    int updateArticle(ArticleInfo var1);
+    int updateArticle(ArticleInfo articleInfo);
 
-    List<ArticleInfo> selectAllArticleByUser(Integer var1);
+    List<ArticleInfo> selectAllArticleByUser(Integer userId);
 
-    ArticleInfo selectArticleById(Integer var1);
+    ArticleInfo selectArticleById(Integer articleId);
 
     int deleteArticleById(Integer articleId);
 }
