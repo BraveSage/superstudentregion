@@ -2,7 +2,10 @@ package com.superstudentregion.controller;
 
 import com.superstudentregion.bean.ArticleInfo;
 import com.superstudentregion.constant.Constants;
+import com.superstudentregion.constant.TokenConstant;
+import com.superstudentregion.exception.ArticleException;
 import com.superstudentregion.service.ArticleService;
+import com.superstudentregion.service.impl.RedisClientSingle;
 import com.superstudentregion.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +21,9 @@ public class ArticleController {
     @Autowired
     ArticleService articleService;
 
+    @Autowired
+    RedisClientSingle redisClient;
+
     public ArticleController() {
     }
 
@@ -26,6 +32,15 @@ public class ArticleController {
             method = {RequestMethod.POST}
     )
     public Result insertArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByMd) {
+//        String token = (String) this.redisClient.get(TokenConstant.TOKEN_USER_PREFIX + articleInfo.getUserId());
+//        if(token.isEmpty()){
+//            throw new ArticleException("请绑定邮箱后");
+//        }
+
+        if(articleInfo.getUserId().equals(null)){
+            throw new ArticleException("请绑定邮箱，只有邮箱用户能够创建文章");
+        }
+
         int i = this.articleService.insertArticle(articleInfo, articleByHtml, articleByMd);
         return i == 0 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "创建文章失败") : Result.success("添加文章成功");
     }

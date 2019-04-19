@@ -15,4 +15,10 @@ public class ExceptionHandlerAdvice {
     public Result handleException(UserException e) {
         return new Result(e.getStatusCode(), e.getMessage());
     }
+
+    @ResponseBody
+    @ExceptionHandler({ArticleException.class})
+    public Result handleException(ArticleException e) {
+        return new Result(e.getStatusCode(), e.getMessage());
+    }
 }

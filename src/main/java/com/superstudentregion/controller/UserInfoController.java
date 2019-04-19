@@ -124,7 +124,13 @@ public class UserInfoController {
             value = "/changeAvatar",
             method = RequestMethod.POST
     )
-    public Result changeAvatar(MultipartFile avatar, Integer userId) {
+    public Result changeAvatar(MultipartFile avatar, Integer userId,String token) {
+        String rToken = (String) this.redisClient.get(TokenConstant.TOKEN_USER_PREFIX + userId);
+
+        if (!TokenUtils.isTokenValid(rToken, token)) {
+            Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "只有邮箱用户才能");
+        }
+
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(userId);
         this.userInfoService.updateAvatar(userInfo, avatar);
