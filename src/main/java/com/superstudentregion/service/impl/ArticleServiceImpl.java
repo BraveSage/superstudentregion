@@ -65,12 +65,12 @@ public class ArticleServiceImpl implements ArticleService {
         //获取文件名称
         String fileName = file.getOriginalFilename();
         //设置文章存储路径
-        String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + fileName;
+        String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis() + fileName;
         //上传文件
         File uploadFile = new File(filePath);
         uploadFile(file, uploadFile);
         //返回文章映射路径
-        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + fileName;
+        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis() + fileName;
         return articlePath;
     }
 
@@ -166,22 +166,29 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     private static String uploadPic(MultipartFile picture, Integer userId) {
-        try {
-            String fileName = picture.getOriginalFilename();
-            String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
-            String articlePath =FilePath.ARTICLE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
-            File uploadFile = new File(filePath);
-            if (!uploadFile.getParentFile().exists()) {
-                uploadFile.getParentFile().mkdirs();
-            }
 
-            picture.transferTo(uploadFile);
-            uploadFile.createNewFile();
+        String fileName = picture.getOriginalFilename();
+        String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
+        String articlePath =FilePath.ARTICLE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
+
+//        Thread thread;
+//        thread = new Thread(() -> {
+                try {
+                    File uploadFile = new File(filePath);
+                    if (!uploadFile.getParentFile().exists()) {
+                        uploadFile.getParentFile().mkdirs();
+                    }
+
+                    picture.transferTo(uploadFile);
+                } catch (IOException e) {
+                    log.error("上传文章图片失败失败", e);
+                    throw new ArticleException(Constants.RESP_STATUS_INTERNAL_ERROR, "上传文章图片失败失败");
+//                    e.printStackTrace();
+                }
+//            });
+//            thread.start();
+            //uploadFile.createNewFile();
             return articlePath;
-        } catch (IOException e) {
-            log.error("上传文章图片失败失败", e);
-            throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "上传文章图片失败失败");
-        }
     }
 
     void userAuthority(Integer userId) {
@@ -198,7 +205,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         try {
             article.transferTo(uploadFile);
-            uploadFile.createNewFile();
+            //uploadFile.createNewFile();
         } catch (IOException e) {
             log.error("上传文章失败", e);
             throw new ArticleException("上传文章失败");

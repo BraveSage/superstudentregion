@@ -73,7 +73,9 @@ public class ArticleController {
             method = {RequestMethod.POST}
     )
     public Result uploadPicture(Integer userId, MultipartFile... pictures) {
+//        System.out.println(System.currentTimeMillis());
         List<String> pics = this.articleService.uploadArticlePic(pictures, userId);
+//        System.out.println(System.currentTimeMillis());
         return Result.success("上传图片成功", pics);
     }
 

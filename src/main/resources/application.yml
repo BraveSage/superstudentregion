@@ -26,6 +26,13 @@ spring:
     maxPoolPreparedStatementPerConnectionSize: 20
     filters: stat,wall,log4j
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+#http:
+      ##      multipart:
+      ##        enabled: true
+    ##        max-file-size: 100MB
+    ##        max-request-size: 100MB
+
   #redis配置
 
   redis:
