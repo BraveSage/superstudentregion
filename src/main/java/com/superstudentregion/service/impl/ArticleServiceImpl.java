@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,7 +37,33 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Transactional
-    public int insertArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByXml) {
+    public int updateArticle(ArticleInfo articleInfo,String articleByHtml, String articleByMd) {
+        //判断用户权限
+        this.userAuthority(articleInfo.getUserId());
+
+        //获取文件修改前的数据，调用其中的文件绝对路径进行操作
+        ArticleInfo oldArticleInfo = articleMapper.selectArticleById(articleInfo.getArticleId());
+
+
+        //更新文章
+        newOptionFile(oldArticleInfo, "html", articleByHtml);
+        newOptionFile(oldArticleInfo, "md", articleByMd);
+
+        //获取文章所有信息
+//            ArticleInfo article = browseArticle(articleInfo.getArticleId());
+
+//            String fileNameByHtml = articleByHtml.getOriginalFilename();
+//            String filePathByHtml =FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + fileNameByHtml;
+//            File uploadFile = new File(filePathByHtml);
+//            articleByHtml.transferTo(uploadFile);
+
+        articleInfo.setSubmitTime(new Date());
+        int i = this.updateArticle(articleInfo);
+        return i;
+    }
+
+    @Transactional
+    public int insertArticle(ArticleInfo articleInfo, String articleByHtml, String articleByMd) {
         //判断用户的权限
         this.userAuthority(articleInfo.getUserId());
         //获取文件名称
@@ -52,13 +80,57 @@ public class ArticleServiceImpl implements ArticleService {
 //        String htmlArticlePath =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + htmlFileName;
 //        String xmlArticlePath =FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + "xml/" + xmlFileName;
 
-        String htmlArticlePath = this.optionFile(articleByHtml, "html", articleInfo);
-        String xmlArticlePath = this.optionFile(articleByXml, "md", articleInfo);
-        articleInfo.setArticleHtmlPath(htmlArticlePath);
-        articleInfo.setArticleMdPath(xmlArticlePath);
+
+        //设置文章映射路径
+        String articlePathByHtml = newOptionFile0(articleInfo, "html");
+        String articlePathByMd = newOptionFile0(articleInfo, "md");
+        articleInfo.setArticleHtmlPath(articlePathByHtml);
+        articleInfo.setArticleMdPath(articlePathByMd);
+
+        //存储文章
+        newOptionFile(articleInfo, "html", articleByHtml);
+        newOptionFile(articleInfo, "md", articleByMd);
+
         int i = this.articleMapper.insertArticle(articleInfo);
         return i;
+
+//        String htmlArticlePath = this.optionFile(articleByHtml, "html", articleInfo);
+//        String xmlArticlePath = this.optionFile(articleByMd, "md", articleInfo);
     }
+
+    public String newOptionFile0(ArticleInfo articleInfo,String type){
+        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis() + articleInfo.getArticleTitle() + "."+ type;
+
+        return articlePath;
+    }
+
+    public void newOptionFile(ArticleInfo articleInfo,String type,String article){
+//        try {
+            Thread thread = new Thread(()->{
+                String filePath;
+                if(type.equals("html")){
+                    filePath = replaceArticleName(articleInfo.getArticleHtmlPath());
+                }else {
+                    filePath = replaceArticleName(articleInfo.getArticleMdPath());
+                }
+                try {
+                    FileOutputStream fileStream = new FileOutputStream(filePath);
+                    //写数据
+                    byte[] articleByBytes = article.getBytes();
+                    fileStream.write(articleByBytes);
+//                    String articlePath = replaceArticleName(articleFilePath);
+                    fileStream.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }catch (IOException e) {
+                    log.error("上传文章失败", e);
+                    throw new ArticleException("上传文章失败");
+                }
+            });
+
+            thread.start();
+    }
+
 
     //操作文件的同时返回文章映射路径
     public String optionFile(MultipartFile file, String type, ArticleInfo articleInfo){
@@ -91,6 +163,10 @@ public class ArticleServiceImpl implements ArticleService {
         return FilePath .ARTICLE_FILE_PATH_PREFIX + filePath.replaceAll(FilePath.ARTICLE_PATH_PREFIX, "");
     }
 
+    public String replaceArticleName(String articlePath){
+        return FilePath .ARTICLE_PATH_PREFIX + articlePath.replaceAll(FilePath.ARTICLE_FILE_PATH_PREFIX, "");
+    }
+
     public static boolean deleteFile(String fileName) {
         File file = new File(fileName);
         // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
@@ -106,25 +182,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
-    @Transactional
-    public int updateArticle(ArticleInfo articleInfo,MultipartFile articleByHtml, MultipartFile articleByXml) {
-        //判断用户权限
-        this.userAuthority(articleInfo.getUserId());
 
-        //获取文章所有信息
-//            ArticleInfo article = browseArticle(articleInfo.getArticleId());
-
-//            String fileNameByHtml = articleByHtml.getOriginalFilename();
-//            String filePathByHtml =FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + "html/" + fileNameByHtml;
-//            File uploadFile = new File(filePathByHtml);
-//            articleByHtml.transferTo(uploadFile);
-
-        optionFile(articleByHtml,"html",articleInfo);
-        optionFile(articleByXml,"xml",articleInfo);
-        articleInfo.setSubmitTime(new Date());
-        int i = this.updateArticle(articleInfo);
-        return i;
-    }
 
     @Transactional
     public int updateArticle(ArticleInfo articleInfo) {

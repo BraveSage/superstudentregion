@@ -35,7 +35,7 @@ public class ArticleController {
             value = {"/createArticle"},
             method = {RequestMethod.POST}
     )
-    public Result insertArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByMd) {
+    public Result insertArticle(ArticleInfo articleInfo, String articleByHtml, String articleByMd) {
 //        String token = (String) this.redisClient.get(TokenConstant.TOKEN_USER_PREFIX + articleInfo.getUserId());
 //        if(token.isEmpty()){
 //            throw new ArticleException("请绑定邮箱后");
@@ -50,10 +50,10 @@ public class ArticleController {
     }
 
     @RequestMapping(
-            value = {"/modifyArticle/{userId}/{articleId}"},
+            value = {"/modifyArticle/"},
             method = {RequestMethod.POST}
     )
-    public Result updateArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByMd) {
+    public Result updateArticle(ArticleInfo articleInfo, String articleByHtml, String articleByMd) {
         int i = this.articleService.updateArticle(articleInfo, articleByHtml,articleByMd);
         return i == 0 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "修改文章失败") : Result.success("修改文章成功");
     }
@@ -80,7 +80,7 @@ public class ArticleController {
     }
 
     @RequestMapping(
-            value = {"/userArticle/{userId}"},
+            value = {"/userArticle/"},
             method = {RequestMethod.POST}
     )
     public Result userArticle(Integer userId) {
@@ -89,7 +89,7 @@ public class ArticleController {
     }
 
     @RequestMapping(
-            value = {"/userArticle/{userId}/{articleId}"},
+            value = {"/userArticle"},
             method = {RequestMethod.POST}
     )
     public Result browseArticle(Integer articleId) {
@@ -97,7 +97,7 @@ public class ArticleController {
         return Result.success("返回文章信息成功", articleInfo);
     }
 
-    @RequestMapping(value = "{userId}/modifyReadPermission",method = RequestMethod.POST)
+    @RequestMapping(value = "/modifyReadPermission",method = RequestMethod.POST)
     public Result updateReadPermission(Integer userId, Integer articleId,Integer readPermission){
         ArticleInfo articleInfo = new ArticleInfo();
         if (articleId != null) {
@@ -108,5 +108,12 @@ public class ArticleController {
         int i = articleService.updateArticle(articleInfo);
 
         return i!=0? Result.success("修改阅读权限成功"): Result.success("修改阅读权限失败");
+    }
+
+    @RequestMapping(value = "/allArticle")
+    public Result allArticle(){
+
+        List<ArticleInfo> articleInfos = articleService.allArticleByUser(null);
+        return Result.success(articleInfos);
     }
 }

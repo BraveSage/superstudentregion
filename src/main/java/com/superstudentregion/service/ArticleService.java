@@ -8,9 +8,9 @@ import java.util.List;
 
 @Service
 public interface ArticleService {
-    int insertArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByXml);
+    int insertArticle(ArticleInfo articleInfo, String articleByHtml, String articleByXml);
 
-    int updateArticle(ArticleInfo articleInfo, MultipartFile articleByHtml, MultipartFile articleByXml);
+    int updateArticle(ArticleInfo articleInfo, String articleByHtml, String articleByXml);
 
     int updateArticle(ArticleInfo articleInfo);
 
