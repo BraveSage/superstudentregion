@@ -108,13 +108,18 @@ public class ArticleServiceImpl implements ArticleService {
 //        try {
             Thread thread = new Thread(()->{
                 String filePath;
+
                 if(type.equals("html")){
-                    filePath = replaceArticleName(articleInfo.getArticleHtmlPath());
+                    filePath = replaceFileName(articleInfo.getArticleHtmlPath());
                 }else {
-                    filePath = replaceArticleName(articleInfo.getArticleMdPath());
+                    filePath = replaceFileName(articleInfo.getArticleMdPath());
                 }
                 try {
-                    FileOutputStream fileStream = new FileOutputStream(filePath);
+                    File file = new File(filePath);
+                    if (!file.getParentFile().exists()) {
+                        file.getParentFile().mkdirs();
+                    }
+                    FileOutputStream fileStream = new FileOutputStream(file);
                     //写数据
                     byte[] articleByBytes = article.getBytes();
                     fileStream.write(articleByBytes);
