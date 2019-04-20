@@ -253,7 +253,7 @@ public class ArticleServiceImpl implements ArticleService {
             //uploadFile.createNewFile();
             return articlePath;
     }
-
+[]
     void userAuthority(Integer userId) {
         UserInfo userInfo = this.userInfoService.selectInfoById(userId);
         if (!userInfo.getStateFlag().equals(StateEnum.NORMAL.getValue())) {
