@@ -2,6 +2,9 @@ package com.superstudentregion.bean;
 
 import java.util.Date;
 
+/**
+ * 评论一级
+ */
 public class ArticleComment {
     /**
      * 评论Id
@@ -14,9 +17,9 @@ public class ArticleComment {
     private Integer submitterId;
 
     /**
-     * 作者ID
+     * 文章ID
      */
-    private Integer authorId;
+    private Integer articleId;
 
     /**
      * 评论内容
@@ -54,12 +57,20 @@ public class ArticleComment {
         this.submitterId = submitterId;
     }
 
-    public Integer getAuthorId() {
-        return authorId;
+    public Integer getArticleId() {
+        return articleId;
     }
 
-    public void setAuthorId(Integer authorId) {
-        this.authorId = authorId;
+    public void setArticleId(Integer articleId) {
+        this.articleId = articleId;
+    }
+
+    public Integer getDelFlag() {
+        return delFlag;
+    }
+
+    public void setDelFlag(Integer delFlag) {
+        this.delFlag = delFlag;
     }
 
     public String getComment() {
@@ -91,10 +102,11 @@ public class ArticleComment {
         return "ArticleComment{" +
                 "commentId=" + commentId +
                 ", submitterId=" + submitterId +
-                ", authorId=" + authorId +
+                ", articleId=" + articleId +
                 ", comment='" + comment + '\'' +
                 ", submitTime=" + submitTime +
                 ", likeCount=" + likeCount +
+                ", delFlag=" + delFlag +
                 '}';
     }
 }
