@@ -1,5 +1,6 @@
 package com.superstudentregion.service.impl;
 
+import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
 import com.superstudentregion.bean.UserInfo;
 import com.superstudentregion.constant.Constants;
@@ -208,8 +209,8 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
-    public List<ArticleInfo> allArticleByUser(Integer userId) {
-        List<ArticleInfo> allArticleByUser = this.articleMapper.selectAllArticleByUser(userId);
+    public List<ArticleResult> allArticleByUser(ArticleResult articleInfo) {
+        List<ArticleResult> allArticleByUser = this.articleMapper.selectAllArticleByUser(articleInfo);
         return allArticleByUser;
     }
 
@@ -253,7 +254,6 @@ public class ArticleServiceImpl implements ArticleService {
             //uploadFile.createNewFile();
             return articlePath;
     }
-[]
     void userAuthority(Integer userId) {
         UserInfo userInfo = this.userInfoService.selectInfoById(userId);
         if (!userInfo.getStateFlag().equals(StateEnum.NORMAL.getValue())) {

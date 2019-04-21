@@ -1,12 +1,13 @@
 package com.superstudentregion.controller;
 
+import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
 import com.superstudentregion.constant.Constants;
-import com.superstudentregion.constant.TokenConstant;
 import com.superstudentregion.exception.ArticleException;
 import com.superstudentregion.mapper.ArticleMapper;
 import com.superstudentregion.service.ArticleService;
 import com.superstudentregion.service.impl.RedisClientSingle;
+import com.superstudentregion.stuenum.ReadPermissionEnum;
 import com.superstudentregion.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -80,11 +81,14 @@ public class ArticleController {
     }
 
     @RequestMapping(
-            value = {"/userArticle/"},
+            value = {"/userAllArticle"},
             method = {RequestMethod.POST}
     )
-    public Result userArticle(Integer userId) {
-        List<ArticleInfo> allArticleByUser = this.articleService.allArticleByUser(userId);
+    public Result userArticle(ArticleResult articleInfo, Integer currentUserId) {
+        if(!articleInfo.getUserId().equals(currentUserId)){
+            articleInfo.setReadPermission(ReadPermissionEnum.PUBLIC.getValue());
+        }
+        List<ArticleResult> allArticleByUser = this.articleService.allArticleByUser(articleInfo);
         return Result.success("返回用户所有文章信息成功", allArticleByUser);
     }
 
@@ -111,9 +115,9 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/allArticle")
-    public Result allArticle(){
+    public Result allArticle(ArticleResult articleInfo ){
 
-        List<ArticleInfo> articleInfos = articleService.allArticleByUser(null);
+        List<ArticleResult> articleInfos = articleService.allArticleByUser(articleInfo);
         return Result.success(articleInfos);
     }
 }

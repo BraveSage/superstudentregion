@@ -18,19 +18,53 @@
         del_flag
     </sql>
 
-    <select id="selectAllArticleByUser" parameterType="Integer" resultType="ArticleInfo">
+    <select id="selectAllArticleByUser" parameterType="ArticleResult" resultType="ArticleResult">
         select
-        <include refid="allCol" />
+            a.article_id,
+            a.article_title,
+            a.submit_time,
+            a.article_html_path,
+            a.article_md_path,
+            a.release_time,
+            a.collection_count,
+            a.like_count,
+            a.read_permission,
+            a.state_flag,
+            a.del_flag,
+            a.type_id,
+            u.user_name,
+            u.avatar_path
         from
-        article_info
+            article_info a
+        left join
+            user_info u
+        on
+            a.user_id = u.user_id
         <where>
-            del_flag = 0
-            <if test="userId != null">
-                and user_id = #{userId}
+            <if test="userId !=null">
+                u.user_id = #{userId}
+            </if>
+            <if test="readPermission!=null">
+                and a.read_permission = #{readPermission}
+            </if>
+            <if test="typeId!=null">
+                and a.type_id &amp; #{typeId} !=0
+            </if>
+            <if test="preReleaseTime!=null and sufReleaseTime!=null">
+                and a.release_time&gt;#{preReleaseTime}
+            </if>
+            <if test="preReleaseTime!=null and sufReleaseTime!=null">
+                and a.release_time&lt;#{sufReleaseTime}
+            </if>
+            <if test="userName!=null and userName!=''">
+                and u.user_name = like '%${userName}%'
+            </if>
+            <if test="articleTitle!=null and articleTitle!=''">
+                and a.article_title like '%${articleTitle}%'
             </if>
         </where>
         order by
-        release_time
+            a.release_time
         desc
     </select>
 
@@ -69,13 +103,7 @@
             <if test="stateFlag!=null">
                 state_flag = #{stateFlag},
             </if>
-            <if test="delFlag!=null">
-                del_flag = #{delFlag},
-            </if>
-            <if test="delFlag!=null">
-                submit_time = #{submitTime}
-            </if>
-
+                release_time =now()
         </set>
         <where>
             <if test="articleId!=null">
@@ -131,7 +159,7 @@
             now(),
             now(),
             0,
-            0,
+            1,
             0
         </trim>
     </insert>

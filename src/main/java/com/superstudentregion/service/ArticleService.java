@@ -1,5 +1,6 @@
 package com.superstudentregion.service;
 
+import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,7 @@ public interface ArticleService {
 
     int deleteArticle(ArticleInfo articleInfo);
 
-    List<ArticleInfo> allArticleByUser(Integer userId);
+    List<ArticleResult> allArticleByUser(ArticleResult articleInfo);
 
     List<String> uploadArticlePic(MultipartFile[] pictures, Integer userId);
 

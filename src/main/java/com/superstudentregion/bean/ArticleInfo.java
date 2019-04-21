@@ -15,8 +15,35 @@ public class ArticleInfo {
     private Integer typeId;
     private Integer delFlag;
     private Integer stateFlag;
+    private Date releaseTime;
+    private Date preReleaseTime;
+    private Date sufReleaseTime;
 
     public ArticleInfo() {
+    }
+
+    public Date getReleaseTime() {
+        return releaseTime;
+    }
+
+    public void setReleaseTime(Date releaseTime) {
+        this.releaseTime = releaseTime;
+    }
+
+    public Date getPreReleaseTime() {
+        return preReleaseTime;
+    }
+
+    public void setPreReleaseTime(Date preReleaseTime) {
+        this.preReleaseTime = preReleaseTime;
+    }
+
+    public Date getSufReleaseTime() {
+        return sufReleaseTime;
+    }
+
+    public void setSufReleaseTime(Date sufReleaseTime) {
+        this.sufReleaseTime = sufReleaseTime;
     }
 
     public Integer getTypeId() {
@@ -130,6 +157,9 @@ public class ArticleInfo {
                 ", typeId=" + typeId +
                 ", delFlag=" + delFlag +
                 ", stateFlag=" + stateFlag +
+                ", releaseTime=" + releaseTime +
+                ", preReleaseTime=" + preReleaseTime +
+                ", sufReleaseTime=" + sufReleaseTime +
                 '}';
     }
 }
