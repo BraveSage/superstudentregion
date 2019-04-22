@@ -210,6 +210,9 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     public List<ArticleResult> allArticleByUser(ArticleResult articleInfo) {
+        if(articleInfo.getTypeId().equals(-1)){
+            articleInfo.setTypeId(null);
+        }
         List<ArticleResult> allArticleByUser = this.articleMapper.selectAllArticleByUser(articleInfo);
         return allArticleByUser;
     }

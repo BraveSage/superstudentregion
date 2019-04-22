@@ -101,7 +101,7 @@ public class UserInfoController {
                     return Result.success("登录成功", manager);
                 }
             } else {
-                return Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "用:该账号已被冻结, 无法登陆");
+                return Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "该账号已被冻结, 无法登陆");
             }
         } else {
             return Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "账号还未激活, 请单击激活邮件中的激活链接激活账号");
