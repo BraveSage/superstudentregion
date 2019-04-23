@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PageBean<T> {
 
-    private Integer currentPagr;
+    private Integer currentPage;
 
     private Integer pageSize;
 
@@ -18,14 +18,12 @@ public class PageBean<T> {
 
     private List<T> items;
 
-    private T hell;
-
-    public Integer getCurrentPagr() {
-        return currentPagr;
+    public Integer getCurrentPage() {
+        return currentPage;
     }
 
-    public void setCurrentPagr(Integer currentPagr) {
-        this.currentPagr = currentPagr;
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
     }
 
     public Integer getPageSize() {
@@ -79,7 +77,7 @@ public class PageBean<T> {
     @Override
     public String toString() {
         return "PageBean{" +
-                "currentPagr=" + currentPagr +
+                "currentPage=" + currentPage +
                 ", pageSize=" + pageSize +
                 ", totalNum=" + totalNum +
                 ", isMore=" + isMore +

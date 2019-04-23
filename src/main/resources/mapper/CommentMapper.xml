@@ -48,8 +48,6 @@
             article_comment
         where
             article_id = #{articleId}
-        and
-            del_flag = 0
 
     </select>
 

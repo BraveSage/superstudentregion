@@ -100,7 +100,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     public String newOptionFile0(ArticleInfo articleInfo,String type){
-        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis() + articleInfo.getArticleTitle() + "."+ type;
+        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis()/* + articleInfo.getArticleTitle()*/ + "."+ type;
 
         return articlePath;
     }
@@ -235,8 +235,9 @@ public class ArticleServiceImpl implements ArticleService {
     private static String uploadPic(MultipartFile picture, Integer userId) {
 
         String fileName = picture.getOriginalFilename();
-        String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
-        String articlePath =FilePath.ARTICLE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + fileName;
+        String prefix=fileName.substring(fileName.lastIndexOf("."));
+        String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + prefix;
+        String articlePath =FilePath.ARTICLE_PATH_PREFIX + userId + "/" + System.currentTimeMillis() + prefix;
 
 //        Thread thread;
 //        thread = new Thread(() -> {
