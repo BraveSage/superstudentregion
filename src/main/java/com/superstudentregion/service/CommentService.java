@@ -9,7 +9,7 @@ import java.util.List;
 public interface CommentService {
     public void createComment(ArticleComment articleComment);
 
-    public void delComement(Integer commentId);
+    public void delComment(Integer commentId);
 
     public List<ArticleComment> allComment(Integer articleId);
 }

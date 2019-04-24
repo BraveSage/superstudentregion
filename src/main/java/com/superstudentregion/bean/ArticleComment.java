@@ -24,7 +24,7 @@ public class ArticleComment {
     /**
      * 评论内容
      */
-    private String comment;
+    private String content;
 
     /**
      * 提交时间
@@ -73,12 +73,12 @@ public class ArticleComment {
         this.delFlag = delFlag;
     }
 
-    public String getComment() {
-        return comment;
+    public String getContent() {
+        return content;
     }
 
-    public void setComment(String comment) {
-        this.comment = comment;
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public Date getSubmitTime() {
@@ -103,7 +103,7 @@ public class ArticleComment {
                 "commentId=" + commentId +
                 ", submitterId=" + submitterId +
                 ", articleId=" + articleId +
-                ", comment='" + comment + '\'' +
+                ", content='" + content + '\'' +
                 ", submitTime=" + submitTime +
                 ", likeCount=" + likeCount +
                 ", delFlag=" + delFlag +

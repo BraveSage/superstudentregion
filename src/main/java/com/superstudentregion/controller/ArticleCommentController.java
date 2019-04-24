@@ -17,7 +17,7 @@ public class ArticleCommentController {
     @Autowired
     CommentService commentService;
 
-    @RequestMapping(value = "allComment",method = RequestMethod.POST)
+    @RequestMapping(value = "/allComment",method = RequestMethod.POST)
     public Result allCommentByArticleId(Integer articleId){
         List<ArticleComment> comments = commentService.allComment(articleId);
 
@@ -26,8 +26,14 @@ public class ArticleCommentController {
 
     @RequestMapping(value = "/delComment",method = RequestMethod.POST)
     public Result delComment(Integer commentId){
-        commentService.delComement(commentId);
+        commentService.delComment(commentId);
         return Result.success("删除评论成功");
+    }
+
+    @RequestMapping(value = "/createComment",method = RequestMethod.POST)
+    public Result createComment(ArticleComment articleComment){
+        commentService.createComment(articleComment);
+        return Result.success("添加评论成功");
     }
 
 

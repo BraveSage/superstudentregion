@@ -32,8 +32,17 @@
             a.state_flag,
             a.del_flag,
             a.type_id,
+            u.user_id userId,
             u.user_name,
-            u.avatar_path
+            u.avatar_path,
+            u.sex,
+            u.school,
+            u.major,
+            u.signature,
+            u.email,
+            u.tel,
+            u.role,
+            u.state_flag userStateFlag
         from
             article_info a
         left join

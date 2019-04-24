@@ -1,6 +1,8 @@
 package com.superstudentregion;
 
+import com.superstudentregion.bean.ArticleComment;
 import com.superstudentregion.bean.UserInfo;
+import com.superstudentregion.controller.ArticleCommentController;
 import com.superstudentregion.controller.ArticleController;
 import com.superstudentregion.controller.UserInfoController;
 import com.superstudentregion.result.ArticleResult;
@@ -22,6 +24,9 @@ public class SuperstudentregionApplicationTests {
     @Autowired
     ArticleController articleController;
 
+    @Autowired
+    ArticleCommentController articleCommentController;
+
     @Test
     public void test() {
         UserInfo userInfo = new UserInfo();
@@ -35,6 +40,26 @@ public class SuperstudentregionApplicationTests {
         articleResult.setTypeId(-1);
         articleResult.setUserId(1);
         Result result = articleController.userArticle(articleResult, 1);
+        System.out.println(JsonUtil.toJson(result));
+    }
+
+    @Test
+    public void insertComment(){
+        ArticleComment articleComment = new ArticleComment();
+        articleComment.setArticleId(10);
+        articleComment.setContent("你好");
+        articleComment.setSubmitterId(1);
+        Result result = articleCommentController.createComment(articleComment);
+        System.out.println(JsonUtil.toJson(result));
+    }
+    @Test
+    public void delComment(){
+        Result result = articleCommentController.delComment(3);
+        System.out.println(JsonUtil.toJson(result));
+    }
+    @Test
+    public void allComment(){
+        Result result = articleCommentController.allCommentByArticleId(10);
         System.out.println(JsonUtil.toJson(result));
     }
 }

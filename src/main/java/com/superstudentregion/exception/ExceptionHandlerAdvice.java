@@ -21,4 +21,10 @@ public class ExceptionHandlerAdvice {
     public Result handleException(ArticleException e) {
         return new Result(e.getStatusCode(), e.getMessage());
     }
+
+    @ResponseBody
+    @ExceptionHandler({CommentException.class})
+    public Result handleException(CommentException e) {
+        return new Result(e.getStatusCode(), e.getMessage());
+    }
 }
