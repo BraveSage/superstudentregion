@@ -41,11 +41,31 @@
         </trim>
     </insert>
 
-    <select id="allCommentByArticle" parameterType="Integer" resultType="ArticleComment">
+    <select id="allCommentByArticle" parameterType="Integer" resultType="ArticleCommentResult">
         select
-            <include refid="allCol" />
+            ac.comment_id,
+            ac.submitter_id,
+            ac.content,
+            ac.submit_time,
+            ac.like_count,
+            ac.del_flag,
+            u.user_name,
+            u.avatar_path,
+            u.sex,
+            u.school,
+            u.major,
+            u.signature,
+            u.email,
+            u.tel,
+            u.role,
+            u.state_flag userStateFlag,
+            u.del_flag
         from
-            article_comment
+            article_comment ac
+        left JOIN
+            user_info u
+        on
+            u.user_id = ac.submitter_id
         where
             article_id = #{articleId}
 

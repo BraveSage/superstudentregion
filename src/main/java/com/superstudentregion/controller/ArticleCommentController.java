@@ -1,6 +1,7 @@
 package com.superstudentregion.controller;
 
 import com.superstudentregion.bean.ArticleComment;
+import com.superstudentregion.result.ArticleCommentResult;
 import com.superstudentregion.service.CommentService;
 import com.superstudentregion.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class ArticleCommentController {
 
     @RequestMapping(value = "/allComment",method = RequestMethod.POST)
     public Result allCommentByArticleId(Integer articleId){
-        List<ArticleComment> comments = commentService.allComment(articleId);
+        List<ArticleCommentResult> comments = commentService.allComment(articleId);
 
         return Result.success(comments);
     }

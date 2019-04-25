@@ -27,36 +27,36 @@ public class SuperstudentregionApplicationTests {
     @Autowired
     ArticleCommentController articleCommentController;
 
-    @Test
-    public void test() {
-        UserInfo userInfo = new UserInfo();
-        userInfo.setUserId(1);
-        Result result = userInfoController.displayInfo(userInfo);
-        System.out.printf(JsonUtil.toJson(result));
-    }
-    @Test
-    public void allArticle(){
-        ArticleResult articleResult = new ArticleResult();
-        articleResult.setTypeId(-1);
-        articleResult.setUserId(1);
-        Result result = articleController.userArticle(articleResult, 1);
-        System.out.println(JsonUtil.toJson(result));
-    }
-
+//    @Test
+//    public void test() {
+//        UserInfo userInfo = new UserInfo();
+//        userInfo.setUserId(1);
+//        Result result = userInfoController.displayInfo(userInfo);
+//        System.out.printf(JsonUtil.toJson(result));
+//    }
+//    @Test
+//    public void allArticle(){
+//        ArticleResult articleResult = new ArticleResult();
+//        articleResult.setTypeId(-1);
+//        articleResult.setUserId(1);
+//        Result result = articleController.userArticle(articleResult, 1);
+//        System.out.println(JsonUtil.toJson(result));
+//    }
+//
     @Test
     public void insertComment(){
         ArticleComment articleComment = new ArticleComment();
         articleComment.setArticleId(10);
-        articleComment.setContent("你好");
+        articleComment.setContent("你好啊啊啊 ");
         articleComment.setSubmitterId(1);
         Result result = articleCommentController.createComment(articleComment);
         System.out.println(JsonUtil.toJson(result));
     }
-    @Test
-    public void delComment(){
-        Result result = articleCommentController.delComment(3);
-        System.out.println(JsonUtil.toJson(result));
-    }
+//    @Test
+//    public void delComment(){
+//        Result result = articleCommentController.delComment(3);
+//        System.out.println(JsonUtil.toJson(result));
+//    }
     @Test
     public void allComment(){
         Result result = articleCommentController.allCommentByArticleId(10);

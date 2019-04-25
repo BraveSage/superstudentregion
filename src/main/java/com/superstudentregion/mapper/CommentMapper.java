@@ -1,6 +1,7 @@
 package com.superstudentregion.mapper;
 
 import com.superstudentregion.bean.ArticleComment;
+import com.superstudentregion.result.ArticleCommentResult;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public interface CommentMapper {
      * @param articleId 文章ID
      * @return 返回文章一级评论的所有内容
      */
-    List<ArticleComment> allCommentByArticle(Integer articleId);
+    List<ArticleCommentResult> allCommentByArticle(Integer articleId);
 
     /**
      * 删除评论

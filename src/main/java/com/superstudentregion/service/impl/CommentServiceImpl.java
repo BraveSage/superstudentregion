@@ -3,6 +3,7 @@ package com.superstudentregion.service.impl;
 import com.superstudentregion.bean.ArticleComment;
 import com.superstudentregion.exception.CommentException;
 import com.superstudentregion.mapper.CommentMapper;
+import com.superstudentregion.result.ArticleCommentResult;
 import com.superstudentregion.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void createComment(ArticleComment articleComment) {
         int i = commentMapper.insertComment(articleComment);
+        System.out.println(articleComment);
         if(i==0){
             throw new CommentException("添加评论失败");
         }
@@ -35,9 +37,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<ArticleComment> allComment(Integer articleId) {
+    public List<ArticleCommentResult> allComment(Integer articleId) {
 
-        List<ArticleComment> allComment = commentMapper.allCommentByArticle(articleId);
+        List<ArticleCommentResult> allComment = commentMapper.allCommentByArticle(articleId);
         return allComment;
 
     }

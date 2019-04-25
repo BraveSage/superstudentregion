@@ -1,6 +1,7 @@
 package com.superstudentregion.service;
 
 import com.superstudentregion.bean.ArticleComment;
+import com.superstudentregion.result.ArticleCommentResult;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,5 +12,5 @@ public interface CommentService {
 
     public void delComment(Integer commentId);
 
-    public List<ArticleComment> allComment(Integer articleId);
+    public List<ArticleCommentResult> allComment(Integer articleId);
 }
