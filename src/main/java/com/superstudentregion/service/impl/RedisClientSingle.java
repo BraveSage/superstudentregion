@@ -117,6 +117,13 @@ public class RedisClientSingle {
         }
     }
 
+
+
+    public Long scard(String key){
+        Long size = this.redisTemplate.opsForSet().size(key);
+        return size;
+    }
+
     public long decr(String key, long delta) {
         if (delta < 0L) {
             throw new RuntimeException("递减因子必须大于0");
@@ -222,6 +229,16 @@ public class RedisClientSingle {
             var4.printStackTrace();
             return 0L;
         }
+    }
+
+    public Boolean ismember(String key, Object value) {
+            Boolean member = this.redisTemplate.opsForSet().isMember(key, value);
+            return member;
+    }
+
+    public Long srem(String key, Object value){
+        Long remove = this.redisTemplate.opsForSet().remove(key, value);
+        return remove;
     }
 
     public long sSetAndTime(String key, long time, Object... values) {

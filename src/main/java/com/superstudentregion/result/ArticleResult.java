@@ -24,6 +24,14 @@ public class ArticleResult extends ArticleInfo {
 
     private Integer userStateFlag;
 
+    private Integer commentCounts;
+
+    private Integer collectorUserId;
+
+    private Integer authorUserId;
+
+    private Long browseCount;
+
     public Integer getSex() {
         return sex;
     }
@@ -96,6 +104,40 @@ public class ArticleResult extends ArticleInfo {
         this.avatarPath = avatarPath;
     }
 
+    public Integer getCommentCounts() {
+        return commentCounts;
+    }
+
+    public void setCommentCounts(Integer commentCounts) {
+        this.commentCounts = commentCounts;
+    }
+
+    public Integer getCollectorUserId() {
+        return collectorUserId;
+    }
+
+    public void setCollectorUserId(Integer collectorUserId) {
+        this.collectorUserId = collectorUserId;
+    }
+
+    public Integer getAuthorUserId() {
+        return authorUserId;
+    }
+
+    public void setAuthorUserId(Integer authorUserId) {
+        this.authorUserId = authorUserId;
+    }
+
+    @Override
+    public Long getBrowseCount() {
+        return browseCount;
+    }
+
+    @Override
+    public void setBrowseCount(Long browseCount) {
+        this.browseCount = browseCount;
+    }
+
     @Override
     public String toString() {
         return "ArticleResult{" +
@@ -108,6 +150,10 @@ public class ArticleResult extends ArticleInfo {
                 ", email='" + email + '\'' +
                 ", tel='" + tel + '\'' +
                 ", userStateFlag=" + userStateFlag +
+                ", commentCounts=" + commentCounts +
+                ", collectorUserId=" + collectorUserId +
+                ", authorUserId=" + authorUserId +
+                ", browseCount=" + browseCount +
                 '}';
     }
 }

@@ -9,6 +9,8 @@ public class Constants {
     public static final int DUE_TIME = 600;
     public static final long DUE_TIME_LONG = 10L;
     public static final String SERVER = "http://193.112.79.70:8080";
+    public static final String ARTICLE_COLLECTOR_COUNT = "article_collector_count_";
+    public static final String ARTICLE_BROWSE_COUNT = "article_browse_count_";
 
     public Constants() {
     }

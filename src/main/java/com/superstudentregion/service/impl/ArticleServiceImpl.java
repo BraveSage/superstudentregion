@@ -1,5 +1,6 @@
 package com.superstudentregion.service.impl;
 
+import com.superstudentregion.bean.CollectorArticle;
 import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
 import com.superstudentregion.bean.UserInfo;
@@ -10,6 +11,7 @@ import com.superstudentregion.exception.UserException;
 import com.superstudentregion.mapper.ArticleMapper;
 import com.superstudentregion.service.ArticleService;
 import com.superstudentregion.service.UserInfoService;
+import com.superstudentregion.stuenum.ReadPermissionEnum;
 import com.superstudentregion.stuenum.StateEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +36,45 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     UserInfoService userInfoService;
 
+    @Autowired
+    RedisClientSingle redisClientSingle;
+
     public ArticleServiceImpl() {
     }
 
+    @Override
+    public List<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult) {
+        articleResult.setReadPermission(ReadPermissionEnum.PUBLIC.getValue());
+        List<ArticleResult> articleResults = articleMapper.allCollectorByUser(articleResult);
+        List<ArticleResult> allArticleByUser = serBrowseCount(articleResults);
+        return allArticleByUser;
+    }
+
+    @Override
+    public void browseCount(Integer articleId) {
+        redisClientSingle.incr(Constants.ARTICLE_BROWSE_COUNT + articleId, 1l);
+    }
+
+    /**
+     * 收藏文章
+     * @param collectorArticle 用户id和文章id
+     */
+    @Override
+    public String collectorCount(CollectorArticle collectorArticle) {
+        //如果已经收藏，那么取消收藏
+        if(redisClientSingle.ismember(Constants.ARTICLE_COLLECTOR_COUNT + collectorArticle.getArticleId(),collectorArticle.getCollectorUserId())){
+            redisClientSingle.srem(Constants.ARTICLE_COLLECTOR_COUNT + collectorArticle.getArticleId(),collectorArticle.getCollectorUserId());
+            articleMapper.delCollector(collectorArticle);
+            return "取消收藏成功";
+        }else {
+            redisClientSingle.sSet(Constants.ARTICLE_COLLECTOR_COUNT + collectorArticle.getArticleId(),collectorArticle.getCollectorUserId());
+            articleMapper.insertCollector(collectorArticle);
+            return "收藏成功";
+        }
+    }
+
     @Transactional
+    @Override
     public int updateArticle(ArticleInfo articleInfo,String articleByHtml, String articleByMd) {
         //判断用户权限
         this.userAuthority(articleInfo.getUserId());
@@ -64,6 +101,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Transactional
+    @Override
     public int insertArticle(ArticleInfo articleInfo, String articleByHtml, String articleByMd) {
         //判断用户的权限
         this.userAuthority(articleInfo.getUserId());
@@ -99,60 +137,9 @@ public class ArticleServiceImpl implements ArticleService {
 //        String xmlArticlePath = this.optionFile(articleByMd, "md", articleInfo);
     }
 
-    public String newOptionFile0(ArticleInfo articleInfo,String type){
-        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis()/* + articleInfo.getArticleTitle()*/ + "."+ type;
-
-        return articlePath;
-    }
-
-    public void newOptionFile(ArticleInfo articleInfo,String type,String article){
-//        try {
-            Thread thread = new Thread(()->{
-                String filePath;
-
-                if(type.equals("html")){
-                    filePath = replaceFileName(articleInfo.getArticleHtmlPath());
-                }else {
-                    filePath = replaceFileName(articleInfo.getArticleMdPath());
-                }
-                try {
-                    File file = new File(filePath);
-                    if (!file.getParentFile().exists()) {
-                        file.getParentFile().mkdirs();
-                    }
-                    FileOutputStream fileStream = new FileOutputStream(file);
-                    //写数据
-                    byte[] articleByBytes = article.getBytes();
-                    fileStream.write(articleByBytes);
-//                    String articlePath = replaceArticleName(articleFilePath);
-                    fileStream.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }catch (IOException e) {
-                    log.error("上传文章失败", e);
-                    throw new ArticleException("上传文章失败");
-                }
-            });
-
-            thread.start();
-    }
-
-
-    //操作文件的同时返回文章映射路径
-    public String optionFile(MultipartFile file, String type, ArticleInfo articleInfo){
-        //获取文件名称
-        String fileName = file.getOriginalFilename();
-        //设置文章存储路径
-        String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis() + fileName;
-        //上传文件
-        File uploadFile = new File(filePath);
-        uploadFile(file, uploadFile);
-        //返回文章映射路径
-        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis() + fileName;
-        return articlePath;
-    }
 
     @Transactional
+    @Override
     public int deleteArticle(ArticleInfo articleInfo) {
         String articleHtmlPath = articleInfo.getArticleHtmlPath();
         String articleMdPath = articleInfo.getArticleMdPath();
@@ -191,6 +178,7 @@ public class ArticleServiceImpl implements ArticleService {
 
 
     @Transactional
+    @Override
     public int updateArticle(ArticleInfo articleInfo) {
 
         int i = this.articleMapper.updateArticle(articleInfo);
@@ -200,8 +188,21 @@ public class ArticleServiceImpl implements ArticleService {
     public void likeArticle(Integer articleId) {
     }
 
-    public ArticleInfo browseArticle(Integer articleId) {
+    public ArticleInfo browseArticle(Integer articleId,Integer browseUserId) {
         ArticleInfo articleInfo = this.articleMapper.selectArticleById(articleId);
+        //收藏数
+        Long collectorCount = redisClientSingle.scard(Constants.ARTICLE_COLLECTOR_COUNT + articleId);
+        articleInfo.setCollectorCount(collectorCount);
+        Boolean exist = redisClientSingle.ismember(Constants.ARTICLE_COLLECTOR_COUNT + articleId, browseUserId);
+        //1为收藏0为未收藏
+        if (exist == true) {
+            articleInfo.setCollectionState(1);
+        } else {
+            articleInfo.setCollectionState(0);
+        }
+        //浏览数
+        Long browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleId);
+        articleInfo.setBrowseCount(browseCount);
         if (!articleInfo.getStateFlag().equals(StateEnum.NORMAL.getValue())) {
             throw new ArticleException("该文章处于冻结状态，无法进行查看");
         } else {
@@ -209,12 +210,79 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
+    @Override
     public List<ArticleResult> allArticleByUser(ArticleResult articleInfo) {
         if(articleInfo.getTypeId().equals(-1)){
             articleInfo.setTypeId(null);
         }
-        List<ArticleResult> allArticleByUser = this.articleMapper.selectAllArticleByUser(articleInfo);
+        List<ArticleResult> allArticleByUser0 = this.articleMapper.selectAllArticleByUser(articleInfo);
+        List<ArticleResult> allArticleByUser = serBrowseCount(allArticleByUser0);
         return allArticleByUser;
+    }
+
+    //给数组添加浏览数，可扩展点赞数等
+    public List<ArticleResult>serBrowseCount(List<ArticleResult> allArticleByUser0){
+        Long browseCount ;
+        List<ArticleResult> allArticleByUser = new ArrayList<ArticleResult>();
+        //返回所有浏览数量
+        for (ArticleResult articleResult:allArticleByUser0) {
+            browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleResult.getArticleId());
+            articleResult.setBrowseCount(browseCount);
+            allArticleByUser.add(articleResult);
+        }
+        return allArticleByUser;
+    }
+    public String newOptionFile0(ArticleInfo articleInfo,String type){
+        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis()/* + articleInfo.getArticleTitle()*/ + "."+ type;
+
+        return articlePath;
+    }
+
+    public void newOptionFile(ArticleInfo articleInfo,String type,String article){
+//        try {
+        Thread thread = new Thread(()->{
+            String filePath;
+
+            if(type.equals("html")){
+                filePath = replaceFileName(articleInfo.getArticleHtmlPath());
+            }else {
+                filePath = replaceFileName(articleInfo.getArticleMdPath());
+            }
+            try {
+                File file = new File(filePath);
+                if (!file.getParentFile().exists()) {
+                    file.getParentFile().mkdirs();
+                }
+                FileOutputStream fileStream = new FileOutputStream(file);
+                //写数据
+                byte[] articleByBytes = article.getBytes();
+                fileStream.write(articleByBytes);
+//                    String articlePath = replaceArticleName(articleFilePath);
+                fileStream.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }catch (IOException e) {
+                log.error("上传文章失败", e);
+                throw new ArticleException("上传文章失败");
+            }
+        });
+
+        thread.start();
+    }
+
+
+    //操作文件的同时返回文章映射路径
+    public String optionFile(MultipartFile file, String type, ArticleInfo articleInfo){
+        //获取文件名称
+        String fileName = file.getOriginalFilename();
+        //设置文章存储路径
+        String filePath = FilePath.ARTICLE_FILE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis() + fileName;
+        //上传文件
+        File uploadFile = new File(filePath);
+        uploadFile(file, uploadFile);
+        //返回文章映射路径
+        String articlePath = FilePath.ARTICLE_PATH_PREFIX + articleInfo.getUserId() + "/" + type + "/" + System.currentTimeMillis() + fileName;
+        return articlePath;
     }
 
     public List<String> uploadArticlePic(MultipartFile[] pictures, Integer userId) {
@@ -228,7 +296,6 @@ public class ArticleServiceImpl implements ArticleService {
             picturePath = uploadPic(picture, userId);
             list.add(picturePath);
         }
-
         return list;
     }
 

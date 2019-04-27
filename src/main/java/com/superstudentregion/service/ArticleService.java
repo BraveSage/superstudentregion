@@ -1,5 +1,6 @@
 package com.superstudentregion.service;
 
+import com.superstudentregion.bean.CollectorArticle;
 import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,18 @@ public interface ArticleService {
 
     void likeArticle(Integer articleId);
 
-    ArticleInfo browseArticle(Integer articleId);
+    ArticleInfo browseArticle(Integer articleId,Integer browseUserId);
 
     int deleteArticle(ArticleInfo articleInfo);
 
     List<ArticleResult> allArticleByUser(ArticleResult articleInfo);
 
     List<String> uploadArticlePic(MultipartFile[] pictures, Integer userId);
+
+    void browseCount(Integer articleId);
+
+    String collectorCount(CollectorArticle collectorArticle);
+
+    List<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult);
 
 }

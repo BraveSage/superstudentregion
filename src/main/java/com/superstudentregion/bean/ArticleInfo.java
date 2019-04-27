@@ -10,7 +10,7 @@ public class ArticleInfo {
     private String articleHtmlPath;
     private String articleMdPath;
     private Integer likeCount;
-    private Integer collectionCount;
+    private Long collectorCount;
     private Integer readPermission;
     private Integer typeId;
     private Integer delFlag;
@@ -18,6 +18,8 @@ public class ArticleInfo {
     private Date releaseTime;
     private Date preReleaseTime;
     private Date sufReleaseTime;
+    private Integer collectionState;
+    private Long browseCount;
 
     public ArticleInfo() {
     }
@@ -54,12 +56,20 @@ public class ArticleInfo {
         this.typeId = typeId;
     }
 
-    public Integer getCollectionCount() {
-        return this.collectionCount;
+    public void setCollectorCount(Long collectorCount) {
+        this.collectorCount = collectorCount;
     }
 
-    public void setCollectionCount(Integer collectionCount) {
-        this.collectionCount = collectionCount;
+    public Long getCollectorCount() {
+        return collectorCount;
+    }
+
+    public Integer getCollectionState() {
+        return collectionState;
+    }
+
+    public void setCollectionState(Integer collectionState) {
+        this.collectionState = collectionState;
     }
 
     public Integer getReadPermission() {
@@ -142,6 +152,14 @@ public class ArticleInfo {
         this.likeCount = likeCount;
     }
 
+    public Long getBrowseCount() {
+        return browseCount;
+    }
+
+    public void setBrowseCount(Long browseCount) {
+        this.browseCount = browseCount;
+    }
+
     @Override
     public String toString() {
         return "ArticleInfo{" +
@@ -152,7 +170,7 @@ public class ArticleInfo {
                 ", articleHtmlPath='" + articleHtmlPath + '\'' +
                 ", articleMdPath='" + articleMdPath + '\'' +
                 ", likeCount=" + likeCount +
-                ", collectionCount=" + collectionCount +
+                ", collectorCount=" + collectorCount +
                 ", readPermission=" + readPermission +
                 ", typeId=" + typeId +
                 ", delFlag=" + delFlag +
@@ -160,6 +178,8 @@ public class ArticleInfo {
                 ", releaseTime=" + releaseTime +
                 ", preReleaseTime=" + preReleaseTime +
                 ", sufReleaseTime=" + sufReleaseTime +
+                ", collectionState=" + collectionState +
+                ", browseCount=" + browseCount +
                 '}';
     }
 }

@@ -1,5 +1,6 @@
 package com.superstudentregion.controller;
 
+import com.superstudentregion.bean.CollectorArticle;
 import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
 import com.superstudentregion.constant.Constants;
@@ -32,6 +33,13 @@ public class ArticleController {
     public ArticleController() {
     }
 
+    /**
+     * 创建文章
+     * @param articleInfo 文章信息
+     * @param articleByHtml html格式文章
+     * @param articleByMd  md文章
+     * @return
+     */
     @RequestMapping(
             value = {"/createArticle"},
             method = {RequestMethod.POST}
@@ -50,6 +58,13 @@ public class ArticleController {
         return i == 0 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "创建文章失败") : Result.success("添加文章成功");
     }
 
+    /**
+     * 修改文章信息
+     * @param articleInfo 文章信息
+     * @param articleByHtml html文章
+     * @param articleByMd   md文章
+     * @return
+     */
     @RequestMapping(
             value = {"/modifyArticle/"},
             method = {RequestMethod.POST}
@@ -80,6 +95,12 @@ public class ArticleController {
         return Result.success("上传图片成功", pics);
     }
 
+    /**
+     * 用户所有文章接口
+     * @param articleInfo
+     * @param currentUserId
+     * @return
+     */
     @RequestMapping(
             value = {"/userAllArticle"},
             method = {RequestMethod.POST}
@@ -96,8 +117,8 @@ public class ArticleController {
             value = {"/userArticle"},
             method = {RequestMethod.POST}
     )
-    public Result browseArticle(Integer articleId) {
-        ArticleInfo articleInfo = this.articleService.browseArticle(articleId);
+    public Result browseArticle(Integer articleId,Integer browserUserId) {
+        ArticleInfo articleInfo = this.articleService.browseArticle(articleId,browserUserId);
         return Result.success("返回文章信息成功", articleInfo);
     }
 
@@ -114,10 +135,33 @@ public class ArticleController {
         return i!=0? Result.success("修改阅读权限成功"): Result.success("修改阅读权限失败");
     }
 
-    @RequestMapping(value = "/allArticle")
+    @RequestMapping(value = "/allArticle",method = RequestMethod.POST)
     public Result allArticle(ArticleResult articleInfo ){
 
         List<ArticleResult> articleInfos = articleService.allArticleByUser(articleInfo);
         return Result.success(articleInfos);
     }
+
+    @RequestMapping(value = "/thumb",method = RequestMethod.POST)
+    public Result thumbArticle(Integer articleId, Integer thumbUserId,Integer thumbState){
+        return null;
+    }
+
+    @RequestMapping(value = "/collector",method = RequestMethod.POST)
+    public Result collectorArticle(CollectorArticle collectorArticle){
+        String info = articleService.collectorCount(collectorArticle);
+        return Result.success(info);
+    }
+
+    @RequestMapping(value = "/allCollectorArticleByUser",method = RequestMethod.POST)
+    public Result allCollectorArticleByUser(ArticleResult articleResult){
+        List<ArticleResult> articleResults = articleService.allCollectorArticleByUser(articleResult);
+        return Result.success(articleResults);
+    }
+
+    @RequestMapping(value = "/browseCount",method = RequestMethod.POST)
+    public void browseCount(Integer articleId){
+        articleService.browseCount(articleId);
+    }
+
 }
