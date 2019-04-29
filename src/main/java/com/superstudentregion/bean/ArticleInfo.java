@@ -20,8 +20,38 @@ public class ArticleInfo {
     private Date sufReleaseTime;
     private Integer collectionState;
     private Long browseCount;
+    //点赞数
+    private Integer thumbUpCount;
+    //踩数
+    private Integer thumbDownCount;
+    //1为已点赞-1为已踩
+    private Integer thumbIsUpOrDown;
 
     public ArticleInfo() {
+    }
+
+    public Integer getThumbUpCount() {
+        return thumbUpCount;
+    }
+
+    public void setThumbUpCount(Integer thumbUpCount) {
+        this.thumbUpCount = thumbUpCount;
+    }
+
+    public Integer getThumbDownCount() {
+        return thumbDownCount;
+    }
+
+    public void setThumbDownCount(Integer thumbDownCount) {
+        this.thumbDownCount = thumbDownCount;
+    }
+
+    public Integer getThumbIsUpOrDown() {
+        return thumbIsUpOrDown;
+    }
+
+    public void setThumbIsUpOrDown(Integer thumbIsUpOrDown) {
+        this.thumbIsUpOrDown = thumbIsUpOrDown;
     }
 
     public Date getReleaseTime() {
@@ -180,6 +210,9 @@ public class ArticleInfo {
                 ", sufReleaseTime=" + sufReleaseTime +
                 ", collectionState=" + collectionState +
                 ", browseCount=" + browseCount +
+                ", thumbUpCount=" + thumbUpCount +
+                ", thumbDownCount=" + thumbDownCount +
+                ", thumbIsUpOrDown=" + thumbIsUpOrDown +
                 '}';
     }
 }

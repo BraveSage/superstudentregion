@@ -12,6 +12,8 @@ public class Constants {
     public static final String ARTICLE_COLLECTOR_COUNT = "article_collector_count_";
     public static final String ARTICLE_BROWSE_COUNT = "article_browse_count_";
 
+    public static final String ARTICLE_THUMB_ = "article_thumb_";
+
     public Constants() {
     }
 }

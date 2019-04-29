@@ -16,13 +16,14 @@ public interface ArticleService {
 
     int updateArticle(ArticleInfo articleInfo);
 
+    @Deprecated
     void likeArticle(Integer articleId);
 
     ArticleInfo browseArticle(Integer articleId,Integer browseUserId);
 
     int deleteArticle(ArticleInfo articleInfo);
 
-    List<ArticleResult> allArticleByUser(ArticleResult articleInfo);
+    List<ArticleResult> allArticleByUser(ArticleResult articleInfo,Integer browserId);
 
     List<String> uploadArticlePic(MultipartFile[] pictures, Integer userId);
 
@@ -30,6 +31,8 @@ public interface ArticleService {
 
     String collectorCount(CollectorArticle collectorArticle);
 
-    List<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult);
+    List<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult,Integer browserId);
+
+    String thumbUpOrDown(Integer userId,Integer articleId,Integer type);
 
 }

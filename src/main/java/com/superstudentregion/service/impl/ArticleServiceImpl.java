@@ -24,9 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ArticleServiceImpl implements ArticleService {
@@ -43,16 +41,17 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult) {
+    public List<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult,Integer browserId) {
         articleResult.setReadPermission(ReadPermissionEnum.PUBLIC.getValue());
         List<ArticleResult> articleResults = articleMapper.allCollectorByUser(articleResult);
-        List<ArticleResult> allArticleByUser = serBrowseCount(articleResults);
+        List<ArticleResult> allArticleByUser = setBrowseCount(articleResults,browserId);
         return allArticleByUser;
     }
 
+    //添加浏览数量
     @Override
     public void browseCount(Integer articleId) {
-        redisClientSingle.incr(Constants.ARTICLE_BROWSE_COUNT + articleId, 1l);
+        redisClientSingle.incr(Constants.ARTICLE_BROWSE_COUNT + articleId, 1L);
     }
 
     /**
@@ -71,6 +70,39 @@ public class ArticleServiceImpl implements ArticleService {
             articleMapper.insertCollector(collectorArticle);
             return "收藏成功";
         }
+    }
+
+    @Override
+    public String thumbUpOrDown(Integer userId, Integer articleId, Integer type) {
+        Set thumbUpSet = (HashSet)redisClientSingle.hget(Constants.ARTICLE_THUMB_ + articleId, 1);
+        Set thumbDownSet = (HashSet)redisClientSingle.hget(Constants.ARTICLE_THUMB_ + articleId, -1);
+
+        if(thumbDownSet==null){
+            thumbDownSet = new HashSet();
+        }
+
+        if(thumbUpSet == null){
+            thumbUpSet = new HashSet();
+        }
+
+        if (type == 1) {
+            thumbUpSet.add(userId);
+            thumbDownSet.remove(userId);
+            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, type, thumbUpSet);
+            return "点赞成功";
+        } else if (type == 0) {
+            thumbUpSet.remove(userId);
+            thumbDownSet.remove(userId);
+            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, type, thumbUpSet);
+            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, type, thumbDownSet);
+            return "取消赞/踩成功";
+        } else if (type == -1) {
+            thumbUpSet.remove(userId);
+            thumbDownSet.add(userId);
+            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, type, thumbDownSet);
+            return "踩成功";
+        }
+        return "操作失败，请重试";
     }
 
     @Transactional
@@ -185,50 +217,132 @@ public class ArticleServiceImpl implements ArticleService {
         return i;
     }
 
+    @Deprecated
     public void likeArticle(Integer articleId) {
     }
+    //添加是否收藏、收藏数、点赞数、是否点赞
+    public ArticleResult setCount(ArticleResult articleResult,Integer browseUserId){
+        //收藏数
+        Long collectorCount = redisClientSingle.scard(Constants.ARTICLE_COLLECTOR_COUNT + articleResult.getArticleId());
+        articleResult.setCollectorCount(collectorCount);
+        Boolean exist = redisClientSingle.ismember(Constants.ARTICLE_COLLECTOR_COUNT + articleResult.getArticleId(), browseUserId);
+        //1为收藏0为未收藏
+        if (exist == true) {
+            articleResult.setCollectionState(1);
+        } else {
+            articleResult.setCollectionState(0);
+        }
+        Set thumbUpSet = (HashSet) redisClientSingle.hget(Constants.ARTICLE_THUMB_ + articleResult.getArticleId(), 1);
+        Set thumbDownSet = (HashSet) redisClientSingle.hget(Constants.ARTICLE_THUMB_ + articleResult.getArticleId(), -1);
+        //防止空指针异常
+        if(thumbDownSet==null){
+            thumbDownSet = new HashSet();
+        }
+        if(thumbUpSet == null){
+            thumbUpSet = new HashSet();
+        }
+        //存在点赞行为
+        boolean existThumbUp = existThumb(thumbUpSet, browseUserId);
+        //存在踩行为
+        boolean existThumbDown = existThumb(thumbDownSet,browseUserId);
+        if(!existThumbUp&&!existThumbDown){
+            articleResult.setThumbIsUpOrDown(0);
+        }else if(existThumbUp){
+            articleResult.setThumbIsUpOrDown(1);
+        }else if(existThumbDown){
+            articleResult.setThumbIsUpOrDown(-1);
+        }
+
+        //赞和踩的总数
+        articleResult.setThumbUpCount(thumbUpSet.size());
+        articleResult.setThumbDownCount(thumbDownSet.size());
+        //浏览数
+        Long browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleResult.getArticleId());
+        articleResult.setBrowseCount(browseCount);
+        return articleResult;
+    }
+
 
     public ArticleInfo browseArticle(Integer articleId,Integer browseUserId) {
         ArticleInfo articleInfo = this.articleMapper.selectArticleById(articleId);
+        if (!articleInfo.getStateFlag().equals(StateEnum.NORMAL.getValue())) {
+            throw new ArticleException("该文章处于冻结状态，无法进行查看");
+        }
         //收藏数
-        Long collectorCount = redisClientSingle.scard(Constants.ARTICLE_COLLECTOR_COUNT + articleId);
+        Long collectorCount = redisClientSingle.scard(Constants.ARTICLE_COLLECTOR_COUNT + articleInfo.getArticleId());
         articleInfo.setCollectorCount(collectorCount);
-        Boolean exist = redisClientSingle.ismember(Constants.ARTICLE_COLLECTOR_COUNT + articleId, browseUserId);
+        Boolean exist = redisClientSingle.ismember(Constants.ARTICLE_COLLECTOR_COUNT + articleInfo.getArticleId(), browseUserId);
         //1为收藏0为未收藏
         if (exist == true) {
             articleInfo.setCollectionState(1);
         } else {
             articleInfo.setCollectionState(0);
         }
-        //浏览数
-        Long browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleId);
-        articleInfo.setBrowseCount(browseCount);
-        if (!articleInfo.getStateFlag().equals(StateEnum.NORMAL.getValue())) {
-            throw new ArticleException("该文章处于冻结状态，无法进行查看");
-        } else {
-            return articleInfo;
+        Set thumbUpSet = (HashSet) redisClientSingle.hget(Constants.ARTICLE_THUMB_ + articleInfo.getArticleId(), 1);
+        Set thumbDownSet = (HashSet) redisClientSingle.hget(Constants.ARTICLE_THUMB_ + articleInfo.getArticleId(), -1);
+        //防止空指针异常
+        if(thumbDownSet==null){
+            thumbDownSet = new HashSet();
         }
+        if(thumbUpSet == null){
+            thumbUpSet = new HashSet();
+        }
+        //存在点赞行为
+        boolean existThumbUp = existThumb(thumbUpSet, browseUserId);
+        //存在踩行为
+        boolean existThumbDown = existThumb(thumbDownSet,browseUserId);
+        if(!existThumbUp&&!existThumbDown){
+            articleInfo.setThumbIsUpOrDown(0);
+        }else if(existThumbUp){
+            articleInfo.setThumbIsUpOrDown(1);
+        }else if(existThumbDown){
+            articleInfo.setThumbIsUpOrDown(-1);
+        }
+        //浏览数
+        Long browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleInfo.getArticleId());
+        articleInfo.setBrowseCount(browseCount);
+        return articleInfo;
+    }
+
+    //存在点赞/踩的行为
+    public boolean existThumb(Set set,Integer browseId){
+        return set.contains(browseId);
     }
 
     @Override
-    public List<ArticleResult> allArticleByUser(ArticleResult articleInfo) {
+    public List<ArticleResult> allArticleByUser(ArticleResult articleInfo,Integer browserId) {
         if(articleInfo.getTypeId().equals(-1)){
             articleInfo.setTypeId(null);
         }
         List<ArticleResult> allArticleByUser0 = this.articleMapper.selectAllArticleByUser(articleInfo);
-        List<ArticleResult> allArticleByUser = serBrowseCount(allArticleByUser0);
+        List<ArticleResult> allArticleByUser = setBrowseCount(allArticleByUser0,browserId);
         return allArticleByUser;
     }
 
     //给数组添加浏览数，可扩展点赞数等
-    public List<ArticleResult>serBrowseCount(List<ArticleResult> allArticleByUser0){
+    public List<ArticleResult>setBrowseCount(List<ArticleResult> allArticleByUser0,Integer browserId){
         Long browseCount ;
         List<ArticleResult> allArticleByUser = new ArrayList<ArticleResult>();
-        //返回所有浏览数量
+        Set thumbUpSet;
+        Set thumbDownSet;
         for (ArticleResult articleResult:allArticleByUser0) {
-            browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleResult.getArticleId());
-            articleResult.setBrowseCount(browseCount);
-            allArticleByUser.add(articleResult);
+            //返回所有浏览数量
+//            browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleResult.getArticleId());
+//            //获取点赞集合
+//            thumbUpSet = (HashSet) redisClientSingle.hget(Constants.ARTICLE_THUMB_ + articleResult.getArticleId(), 1);
+//            thumbDownSet = (HashSet) redisClientSingle.hget(Constants.ARTICLE_THUMB_ + articleResult.getArticleId(), -1);
+//            if(thumbDownSet==null){
+//                thumbDownSet = new HashSet();
+//            }
+//            if(thumbUpSet == null){
+//                thumbUpSet = new HashSet();
+//            }
+//            articleResult.setThumbUpCount(thumbUpSet.size());
+//            articleResult.setThumbDownCount(thumbDownSet.size());
+//            articleResult.setBrowseCount(browseCount);
+
+            ArticleResult articleResult1 = setCount(articleResult, browserId);
+            allArticleByUser.add(articleResult1);
         }
         return allArticleByUser;
     }

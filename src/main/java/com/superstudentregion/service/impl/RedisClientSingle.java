@@ -132,7 +132,7 @@ public class RedisClientSingle {
         }
     }
 
-    public Object hget(String key, String item) {
+    public Object hget(String key, Object item) {
         return this.redisTemplate.opsForHash().get(key, item);
     }
 
@@ -164,7 +164,7 @@ public class RedisClientSingle {
         }
     }
 
-    public boolean hset(String key, String item, Object value) {
+    public boolean hset(String key, Object item, Object value) {
         try {
             this.redisTemplate.opsForHash().put(key, item, value);
             return true;

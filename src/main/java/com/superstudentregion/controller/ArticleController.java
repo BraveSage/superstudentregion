@@ -109,7 +109,7 @@ public class ArticleController {
         if(!articleInfo.getUserId().equals(currentUserId)){
             articleInfo.setReadPermission(ReadPermissionEnum.PUBLIC.getValue());
         }
-        List<ArticleResult> allArticleByUser = this.articleService.allArticleByUser(articleInfo);
+        List<ArticleResult> allArticleByUser = this.articleService.allArticleByUser(articleInfo,currentUserId);
         return Result.success("返回用户所有文章信息成功", allArticleByUser);
     }
 
@@ -136,15 +136,10 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/allArticle",method = RequestMethod.POST)
-    public Result allArticle(ArticleResult articleInfo ){
+    public Result allArticle(ArticleResult articleInfo ,Integer currentUserId){
 
-        List<ArticleResult> articleInfos = articleService.allArticleByUser(articleInfo);
+        List<ArticleResult> articleInfos = articleService.allArticleByUser(articleInfo,currentUserId);
         return Result.success(articleInfos);
-    }
-
-    @RequestMapping(value = "/thumb",method = RequestMethod.POST)
-    public Result thumbArticle(Integer articleId, Integer thumbUserId,Integer thumbState){
-        return null;
     }
 
     @RequestMapping(value = "/collector",method = RequestMethod.POST)
@@ -154,14 +149,27 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/allCollectorArticleByUser",method = RequestMethod.POST)
-    public Result allCollectorArticleByUser(ArticleResult articleResult){
-        List<ArticleResult> articleResults = articleService.allCollectorArticleByUser(articleResult);
+    public Result allCollectorArticleByUser(ArticleResult articleResult,Integer browserId){
+        List<ArticleResult> articleResults = articleService.allCollectorArticleByUser(articleResult,browserId);
         return Result.success(articleResults);
     }
 
     @RequestMapping(value = "/browseCount",method = RequestMethod.POST)
     public void browseCount(Integer articleId){
         articleService.browseCount(articleId);
+    }
+
+    /**
+     * 点赞或者踩
+     * @param userId 点赞的用户id
+     * @param articleId 被点赞的文章
+     * @param type 1赞 0取消 赞或者踩 -1踩
+     * @return
+     */
+    @RequestMapping(value="/thumb",method = RequestMethod.POST)
+    public Result thumbUpOrDown(Integer userId,Integer articleId,Integer type){
+        String info = articleService.thumbUpOrDown(userId, articleId, type);
+        return Result.success(info);
     }
 
 }
