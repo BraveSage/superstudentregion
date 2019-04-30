@@ -51,7 +51,7 @@ public class ArticleServiceImpl implements ArticleService {
     //添加浏览数量
     @Override
     public void browseCount(Integer articleId) {
-        redisClientSingle.incr(Constants.ARTICLE_BROWSE_COUNT + articleId, 1L);
+        redisClientSingle.incr(Constants.ARTICLE_BROWSE_COUNT + articleId, 1);
     }
 
     /**
@@ -93,8 +93,8 @@ public class ArticleServiceImpl implements ArticleService {
         } else if (type == 0) {
             thumbUpSet.remove(userId);
             thumbDownSet.remove(userId);
-            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, type, thumbUpSet);
-            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, type, thumbDownSet);
+            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, 1, thumbUpSet);
+            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, -1, thumbDownSet);
             return "取消赞/踩成功";
         } else if (type == -1) {
             thumbUpSet.remove(userId);
@@ -257,7 +257,7 @@ public class ArticleServiceImpl implements ArticleService {
         articleResult.setThumbUpCount(thumbUpSet.size());
         articleResult.setThumbDownCount(thumbDownSet.size());
         //浏览数
-        Long browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleResult.getArticleId());
+        Integer browseCount = (Integer) redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleResult.getArticleId());
         articleResult.setBrowseCount(browseCount);
         return articleResult;
     }
@@ -299,7 +299,7 @@ public class ArticleServiceImpl implements ArticleService {
             articleInfo.setThumbIsUpOrDown(-1);
         }
         //浏览数
-        Long browseCount = (Long)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleInfo.getArticleId());
+        Integer browseCount = (Integer)redisClientSingle.get(Constants.ARTICLE_BROWSE_COUNT + articleInfo.getArticleId());
         articleInfo.setBrowseCount(browseCount);
         return articleInfo;
     }

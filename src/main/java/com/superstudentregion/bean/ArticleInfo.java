@@ -19,7 +19,7 @@ public class ArticleInfo {
     private Date preReleaseTime;
     private Date sufReleaseTime;
     private Integer collectionState;
-    private Long browseCount;
+    private Integer browseCount;
     //点赞数
     private Integer thumbUpCount;
     //踩数
@@ -182,11 +182,11 @@ public class ArticleInfo {
         this.likeCount = likeCount;
     }
 
-    public Long getBrowseCount() {
+    public Integer getBrowseCount() {
         return browseCount;
     }
 
-    public void setBrowseCount(Long browseCount) {
+    public void setBrowseCount(Integer browseCount) {
         this.browseCount = browseCount;
     }
 

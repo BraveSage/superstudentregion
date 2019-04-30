@@ -30,8 +30,6 @@ public class ArticleResult extends ArticleInfo {
 
     private Integer authorUserId;
 
-    private Long browseCount;
-
     public Integer getSex() {
         return sex;
     }
@@ -129,16 +127,6 @@ public class ArticleResult extends ArticleInfo {
     }
 
     @Override
-    public Long getBrowseCount() {
-        return browseCount;
-    }
-
-    @Override
-    public void setBrowseCount(Long browseCount) {
-        this.browseCount = browseCount;
-    }
-
-    @Override
     public String toString() {
         return "ArticleResult{" +
                 "userName='" + userName + '\'' +
@@ -153,7 +141,6 @@ public class ArticleResult extends ArticleInfo {
                 ", commentCounts=" + commentCounts +
                 ", collectorUserId=" + collectorUserId +
                 ", authorUserId=" + authorUserId +
-                ", browseCount=" + browseCount +
                 '}';
     }
 }

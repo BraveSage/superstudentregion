@@ -109,8 +109,8 @@ public class RedisClientSingle {
         }
     }
 
-    public long incr(String key, long delta) {
-        if (delta < 0L) {
+    public long incr(String key, int delta) {
+        if (delta < 0) {
             throw new RuntimeException("递增因子必须大于0");
         } else {
             return this.redisTemplate.opsForValue().increment(key, delta);

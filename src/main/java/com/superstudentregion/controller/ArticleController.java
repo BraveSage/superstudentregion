@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -78,7 +79,7 @@ public class ArticleController {
             value = {"/delArticle"},
             method = {RequestMethod.POST}
     )
-    public Result deleteArticle(Integer articleId) {
+    public Result deleteArticle(@Valid Integer articleId) {
         ArticleInfo articleInfo = articleMapper.selectArticleById(articleId);
         int i = this.articleService.deleteArticle(articleInfo);
         return i != 1 ? Result.failure(Constants.RESP_STATUS_INTERNAL_ERROR, "删除文章失败") : Result.success("删除文章成功");
@@ -98,18 +99,18 @@ public class ArticleController {
     /**
      * 用户所有文章接口
      * @param articleInfo
-     * @param currentUserId
+     * @param browserUserId 
      * @return
      */
     @RequestMapping(
             value = {"/userAllArticle"},
             method = {RequestMethod.POST}
     )
-    public Result userArticle(ArticleResult articleInfo, Integer currentUserId) {
-        if(!articleInfo.getUserId().equals(currentUserId)){
+    public Result userArticle(@Valid ArticleResult articleInfo,@Valid Integer browserUserId ) {
+        if(!articleInfo.getUserId().equals(browserUserId )){
             articleInfo.setReadPermission(ReadPermissionEnum.PUBLIC.getValue());
         }
-        List<ArticleResult> allArticleByUser = this.articleService.allArticleByUser(articleInfo,currentUserId);
+        List<ArticleResult> allArticleByUser = this.articleService.allArticleByUser(articleInfo,browserUserId );
         return Result.success("返回用户所有文章信息成功", allArticleByUser);
     }
 
@@ -117,13 +118,13 @@ public class ArticleController {
             value = {"/userArticle"},
             method = {RequestMethod.POST}
     )
-    public Result browseArticle(Integer articleId,Integer browserUserId) {
+    public Result browseArticle(@Valid Integer articleId,@Valid Integer browserUserId) {
         ArticleInfo articleInfo = this.articleService.browseArticle(articleId,browserUserId);
         return Result.success("返回文章信息成功", articleInfo);
     }
 
     @RequestMapping(value = "/modifyReadPermission",method = RequestMethod.POST)
-    public Result updateReadPermission(Integer userId, Integer articleId,Integer readPermission){
+    public Result updateReadPermission(@Valid Integer userId,@Valid Integer articleId,@Valid Integer readPermission){
         ArticleInfo articleInfo = new ArticleInfo();
         if (articleId != null) {
             articleInfo.setArticleId(articleId);
@@ -136,26 +137,26 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/allArticle",method = RequestMethod.POST)
-    public Result allArticle(ArticleResult articleInfo ,Integer currentUserId){
+    public Result allArticle(ArticleResult articleInfo ,@Valid Integer browserUserId ){
 
-        List<ArticleResult> articleInfos = articleService.allArticleByUser(articleInfo,currentUserId);
+        List<ArticleResult> articleInfos = articleService.allArticleByUser(articleInfo,browserUserId );
         return Result.success(articleInfos);
     }
 
     @RequestMapping(value = "/collector",method = RequestMethod.POST)
-    public Result collectorArticle(CollectorArticle collectorArticle){
+    public Result collectorArticle(@Valid CollectorArticle collectorArticle){
         String info = articleService.collectorCount(collectorArticle);
         return Result.success(info);
     }
 
     @RequestMapping(value = "/allCollectorArticleByUser",method = RequestMethod.POST)
-    public Result allCollectorArticleByUser(ArticleResult articleResult,Integer browserId){
+    public Result allCollectorArticleByUser(ArticleResult articleResult,@Valid Integer browserId){
         List<ArticleResult> articleResults = articleService.allCollectorArticleByUser(articleResult,browserId);
         return Result.success(articleResults);
     }
 
     @RequestMapping(value = "/browseCount",method = RequestMethod.POST)
-    public void browseCount(Integer articleId){
+    public void browseCount(@Valid Integer articleId){
         articleService.browseCount(articleId);
     }
 
@@ -167,7 +168,7 @@ public class ArticleController {
      * @return
      */
     @RequestMapping(value="/thumb",method = RequestMethod.POST)
-    public Result thumbUpOrDown(Integer userId,Integer articleId,Integer type){
+    public Result thumbUpOrDown(@Valid Integer userId,@Valid Integer articleId,@Valid Integer type){
         String info = articleService.thumbUpOrDown(userId, articleId, type);
         return Result.success(info);
     }
