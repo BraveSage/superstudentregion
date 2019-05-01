@@ -66,7 +66,7 @@ public class SuperstudentregionApplicationTests {
 //    }
     @Test
     public void allComment(){
-        Result result = articleCommentController.allCommentByArticleId(10);
+        Result result = articleCommentController.allCommentByArticleId(10,1,2);
         System.out.println(JsonUtil.toJson(result));
     }
 
@@ -83,7 +83,7 @@ public class SuperstudentregionApplicationTests {
     public void allCollectorArticle(){
         ArticleResult articleResult = new ArticleResult();
         articleResult.setCollectorUserId(1);
-        Result result = articleController.allCollectorArticleByUser(articleResult);
+        Result result = articleController.allCollectorArticleByUser(articleResult,1,1,10);
 
         System.out.println(JsonUtil.toJson(result));
     }
