@@ -1,5 +1,6 @@
 package com.superstudentregion.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.superstudentregion.bean.ArticleComment;
 import com.superstudentregion.result.ArticleCommentResult;
 import com.superstudentregion.service.CommentService;
@@ -18,9 +19,9 @@ public class ArticleCommentController {
     @Autowired
     CommentService commentService;
 
-    @RequestMapping(value = "/allComment",method = RequestMethod.POST)
-    public Result allCommentByArticleId(Integer articleId){
-        List<ArticleCommentResult> comments = commentService.allComment(articleId);
+    @RequestMapping(value = "/allCommentByArticle",method = RequestMethod.POST)
+    public Result allCommentByArticleId(Integer articleId,Integer currentPage,Integer pageSize){
+        PageInfo<ArticleCommentResult> comments = commentService.allComment(articleId,currentPage,pageSize);
 
         return Result.success(comments);
     }

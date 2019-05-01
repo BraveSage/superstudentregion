@@ -1,5 +1,6 @@
 package com.superstudentregion.service;
 
+import com.github.pagehelper.PageInfo;
 import com.superstudentregion.bean.ArticleComment;
 import com.superstudentregion.result.ArticleCommentResult;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,9 @@ import java.util.List;
 
 @Service
 public interface CommentService {
-    public void createComment(ArticleComment articleComment);
+    void createComment(ArticleComment articleComment);
 
-    public void delComment(Integer commentId);
+    void delComment(Integer commentId);
 
-    public List<ArticleCommentResult> allComment(Integer articleId);
+    PageInfo<ArticleCommentResult> allComment(Integer articleId,Integer currentPage,Integer pageSize);
 }

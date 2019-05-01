@@ -51,6 +51,11 @@ public class Result<T> {
         return result;
     }
 
+    public static <T> Result<T> success(T respBody) {
+
+        return Result.success(null,respBody);
+    }
+
     public static <T> Result<T> success(List<T> respBody) {
         new ArrayList();
         Result<T> result = success();

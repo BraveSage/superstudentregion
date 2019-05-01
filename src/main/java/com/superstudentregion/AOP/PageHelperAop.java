@@ -27,7 +27,7 @@ public class PageHelperAop {
     private static final Logger log = LoggerFactory.getLogger(PageHelperAop.class);
 
     private static final ThreadLocal<PageBean> pageBeanContext = new ThreadLocal();
-    @Before(value = "execution(public * com.superstudentregion.controller.*.*WithPage(..))")
+    @Before(value = "execution(public * com.superstudentregion.controller.*.all*(..))")
     public void controllerAop(JoinPoint joinPoint) throws Exception {
         log.info("Controller正在执行PageHelperAop");
         PageBean pageBean =null;
@@ -50,14 +50,14 @@ public class PageHelperAop {
         pageBeanContext.set(pageBean);
     }
 
-    @Before(value = "execution(public * com.zrl.service.impl.*.*WithPage(..))")
+    @Before(value = "execution(public * com.superstudentregion.service.impl.*.all*(..))")
     public void serviceImplAop(){
         log.info("Impl正在执行PageHelperAop");
         PageBean pageBean = pageBeanContext.get();
         PageHelper.startPage(pageBean.getCurrentPage(), pageBean.getPageSize());
     }
 
-    @AfterReturning(value = "execution(* com.zrl.mapper.*.*WithPage(..))")
+    @AfterReturning(value = "execution(* com.superstudentregion.mapper.*.all*(..))")
     public void mapperAop(){
         log.info("mapper正在执行PageHelperAop");
     }

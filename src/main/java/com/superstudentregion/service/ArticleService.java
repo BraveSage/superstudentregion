@@ -1,5 +1,6 @@
 package com.superstudentregion.service;
 
+import com.github.pagehelper.PageInfo;
 import com.superstudentregion.bean.CollectorArticle;
 import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
@@ -23,7 +24,7 @@ public interface ArticleService {
 
     int deleteArticle(ArticleInfo articleInfo);
 
-    List<ArticleResult> allArticleByUser(ArticleResult articleInfo,Integer browserId);
+    PageInfo<ArticleResult> allArticleByUser(ArticleResult articleInfo, Integer browserId, Integer currentPage, Integer pageSize);
 
     List<String> uploadArticlePic(MultipartFile[] pictures, Integer userId);
 
@@ -31,7 +32,7 @@ public interface ArticleService {
 
     String collectorCount(CollectorArticle collectorArticle);
 
-    List<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult,Integer browserId);
+    PageInfo<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult,Integer browserId,Integer currentPage,Integer pageSize);
 
     String thumbUpOrDown(Integer userId,Integer articleId,Integer type);
 

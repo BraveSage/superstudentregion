@@ -1,5 +1,6 @@
 package com.superstudentregion.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import com.superstudentregion.bean.CollectorArticle;
 import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
@@ -41,11 +42,13 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult,Integer browserId) {
+    public PageInfo<ArticleResult> allCollectorArticleByUser(ArticleResult articleResult,Integer browserId,Integer currentPage,Integer pageSize) {
         articleResult.setReadPermission(ReadPermissionEnum.PUBLIC.getValue());
         List<ArticleResult> articleResults = articleMapper.allCollectorByUser(articleResult);
         List<ArticleResult> allArticleByUser = setBrowseCount(articleResults,browserId);
-        return allArticleByUser;
+        PageInfo<ArticleResult> userPageInfo = new PageInfo<>(allArticleByUser);
+
+        return userPageInfo;
     }
 
     //添加浏览数量
@@ -310,13 +313,15 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleResult> allArticleByUser(ArticleResult articleInfo,Integer browserId) {
+    public PageInfo<ArticleResult> allArticleByUser(ArticleResult articleInfo,Integer browserId,Integer currentPage,Integer pageSize) {
         if(articleInfo.getTypeId().equals(-1)){
             articleInfo.setTypeId(null);
         }
-        List<ArticleResult> allArticleByUser0 = this.articleMapper.selectAllArticleByUser(articleInfo);
+        List<ArticleResult> allArticleByUser0 = this.articleMapper.allArticleByUser(articleInfo);
         List<ArticleResult> allArticleByUser = setBrowseCount(allArticleByUser0,browserId);
-        return allArticleByUser;
+
+        PageInfo<ArticleResult> userPageInfo = new PageInfo<>(allArticleByUser);
+        return userPageInfo;
     }
 
     //给数组添加浏览数，可扩展点赞数等

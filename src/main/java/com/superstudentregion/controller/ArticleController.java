@@ -1,5 +1,6 @@
 package com.superstudentregion.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.superstudentregion.bean.CollectorArticle;
 import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.bean.ArticleInfo;
@@ -106,11 +107,11 @@ public class ArticleController {
             value = {"/userAllArticle"},
             method = {RequestMethod.POST}
     )
-    public Result userArticle(@Valid ArticleResult articleInfo,@Valid Integer browserUserId ) {
+    public Result allArticleByUser(@Valid ArticleResult articleInfo,@Valid Integer browserUserId ,Integer currentPage,Integer pageSize) {
         if(!articleInfo.getUserId().equals(browserUserId )){
             articleInfo.setReadPermission(ReadPermissionEnum.PUBLIC.getValue());
         }
-        List<ArticleResult> allArticleByUser = this.articleService.allArticleByUser(articleInfo,browserUserId );
+        PageInfo<ArticleResult> allArticleByUser = this.articleService.allArticleByUser(articleInfo,browserUserId , currentPage, pageSize);
         return Result.success("返回用户所有文章信息成功", allArticleByUser);
     }
 
@@ -137,9 +138,9 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/allArticle",method = RequestMethod.POST)
-    public Result allArticle(ArticleResult articleInfo ,@Valid Integer browserUserId ){
+    public Result allArticle(ArticleResult articleInfo ,@Valid Integer browserUserId ,Integer currentPage,Integer pageSize){
 
-        List<ArticleResult> articleInfos = articleService.allArticleByUser(articleInfo,browserUserId );
+        PageInfo<ArticleResult> articleInfos = articleService.allArticleByUser(articleInfo,browserUserId,currentPage, pageSize);
         return Result.success(articleInfos);
     }
 
@@ -150,8 +151,8 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/allCollectorArticleByUser",method = RequestMethod.POST)
-    public Result allCollectorArticleByUser(ArticleResult articleResult,@Valid Integer browserId){
-        List<ArticleResult> articleResults = articleService.allCollectorArticleByUser(articleResult,browserId);
+    public Result allCollectorArticleByUser(ArticleResult articleResult,@Valid Integer browserId,Integer currentPage,Integer pageSize){
+        PageInfo<ArticleResult> articleResults = articleService.allCollectorArticleByUser(articleResult,browserId,currentPage, pageSize);
         return Result.success(articleResults);
     }
 

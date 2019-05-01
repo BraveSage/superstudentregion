@@ -12,7 +12,7 @@ public interface ArticleMapper {
 
     int updateArticle(ArticleInfo articleInfo);
 
-    List<ArticleResult> selectAllArticleByUser(ArticleResult articleInfo);
+    List<ArticleResult> allArticleByUser(ArticleResult articleInfo);
 
     ArticleInfo selectArticleById(@Param(value="articleId")Integer articleId);
 

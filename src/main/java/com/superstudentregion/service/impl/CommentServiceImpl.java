@@ -1,9 +1,11 @@
 package com.superstudentregion.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import com.superstudentregion.bean.ArticleComment;
 import com.superstudentregion.exception.CommentException;
 import com.superstudentregion.mapper.CommentMapper;
 import com.superstudentregion.result.ArticleCommentResult;
+import com.superstudentregion.result.ArticleResult;
 import com.superstudentregion.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,10 +39,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<ArticleCommentResult> allComment(Integer articleId) {
+    public PageInfo<ArticleCommentResult> allComment(Integer articleId,Integer currentPage,Integer pageSize) {
 
         List<ArticleCommentResult> allComment = commentMapper.allCommentByArticle(articleId);
-        return allComment;
+        PageInfo<ArticleCommentResult> commentInfo = new PageInfo<>(allComment);
+        return commentInfo;
 
     }
 }
