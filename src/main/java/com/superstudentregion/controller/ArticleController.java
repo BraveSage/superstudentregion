@@ -151,8 +151,8 @@ public class ArticleController {
     }
 
     @RequestMapping(value = "/allCollectorArticleByUser",method = RequestMethod.POST)
-    public Result allCollectorArticleByUser(ArticleResult articleResult,@Valid Integer browserId,Integer currentPage,Integer pageSize){
-        PageInfo<ArticleResult> articleResults = articleService.allCollectorArticleByUser(articleResult,browserId,currentPage, pageSize);
+    public Result allCollectorArticleByUser(ArticleResult articleResult,@Valid Integer browserUserId,Integer currentPage,Integer pageSize){
+        PageInfo<ArticleResult> articleResults = articleService.allCollectorArticleByUser(articleResult,browserUserId,currentPage, pageSize);
         return Result.success(articleResults);
     }
 

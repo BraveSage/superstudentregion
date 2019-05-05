@@ -114,7 +114,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             if (userInfo1 != null) {
                 if (userInfo1.getStateFlag().equals(StateEnum.ACTIVE.getValue())) {
                     if (this.redisTemplate.get(userEmail + 1) != null) {
-                        Long ttl = this.redisTemplate.ttl(userEmail);
+                        Long ttl = this.redisTemplate.ttl(userEmail + 1);
                         throw new UserException(Constants.RESP_STATUS_INTERNAL_ERROR, "邮箱注册确认邮件有效期为 10 分钟，您可以在" + (ttl + 1L) + "分钟之后再进行该操作");
                     } else {
                         this.redisTemplate.set(userEmail + 1, "nondue", 600L);
