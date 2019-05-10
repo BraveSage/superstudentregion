@@ -46,7 +46,7 @@ public class SuperstudentregionApplicationTests {
 //        ArticleResult articleResult = new ArticleResult();
 //        articleResult.setTypeId(-1);
 //        articleResult.setUserId(1);
-//        Result result = articleController.userArticle(articleResult, 1);
+//        Result result = articleController.allArticleByUser(articleResult, 1,1,10);
 //        System.out.println(JsonUtil.toJson(result));
 //    }
 //
@@ -85,6 +85,12 @@ public class SuperstudentregionApplicationTests {
         articleResult.setCollectorUserId(1);
         Result result = articleController.allCollectorArticleByUser(articleResult,1,1,10);
 
+        System.out.println(JsonUtil.toJson(result));
+    }
+
+    @Test
+    public void bindEmail(){
+        Result result = userInfoController.bindUser0("979612783@qq.com", 1);
         System.out.println(JsonUtil.toJson(result));
     }
 }

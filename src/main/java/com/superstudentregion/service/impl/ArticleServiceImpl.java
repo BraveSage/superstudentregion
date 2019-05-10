@@ -92,6 +92,7 @@ public class ArticleServiceImpl implements ArticleService {
             thumbUpSet.add(userId);
             thumbDownSet.remove(userId);
             redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, type, thumbUpSet);
+            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, -1, thumbDownSet);
             return "点赞成功";
         } else if (type == 0) {
             thumbUpSet.remove(userId);
@@ -102,6 +103,7 @@ public class ArticleServiceImpl implements ArticleService {
         } else if (type == -1) {
             thumbUpSet.remove(userId);
             thumbDownSet.add(userId);
+            redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, 1, thumbUpSet);
             redisClientSingle.hset(Constants.ARTICLE_THUMB_+articleId, type, thumbDownSet);
             return "踩成功";
         }

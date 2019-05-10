@@ -308,7 +308,7 @@
 
     <select id="selectInfoByQQOpenid" parameterType="String" resultType="BasicUserInfo">
         select
-        id,
+--         id,
         user_name,
         avatar_path,
         nickname,
@@ -326,7 +326,7 @@
 
     <select id="selectInfoByWechatOpenid" parameterType="String" resultType="BasicUserInfo">
         select
-        id,
+--         id,
         user_name,
         avatar_path,
         nickname,
