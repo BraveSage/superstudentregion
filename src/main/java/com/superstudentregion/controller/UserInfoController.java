@@ -172,8 +172,10 @@ public class UserInfoController {
         long submitTime = Long.valueOf(parameter);
         long currentTimeMillis = System.currentTimeMillis();
         String userName = request.getParameter(GenerateLinkUtil.getUserNameKey());
+        int userId =  Integer.parseInt(request.getParameter(GenerateLinkUtil.getUserId()));
         UserInfo userInfo = new UserInfo();
         userInfo.setUserName(userName);
+        userInfo.setUserId(userId);
         userInfo.setStateFlag(StateEnum.NORMAL.getValue());
         long duration = currentTimeMillis - submitTime;
         if (CurrentTimeUtil.duration(duration)) {
