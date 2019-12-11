@@ -8,7 +8,7 @@ spring:
     username: root
     password: ee.148639
     type: com.alibaba.druid.pool.DruidDataSource
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     tomcat:
       initSQL: SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci
     #连接池的配置信息
@@ -33,6 +33,28 @@ spring:
     ##        max-file-size: 100MB
     ##        max-request-size: 100MB
 
+## rabbitmq
+  rabbitmq:
+    addresses: 193.112.79.70:5672
+    username: admin
+    password: admin
+    #不同的项目可以拥有不同的虚拟主机
+    virtual-host: studentregion
+    #超时时间
+    connection-timeout: 15000
+
+    #消费端设置
+    listener:
+      simple:
+        #并发数
+        concurrency: 4
+        #ack类型 AUTO manual 手工签收
+        acknowledge-mode: AUTO
+        #最大并发数
+        max-concurrency: 10
+        #限流 同一时间内只有一条消息能被消费
+        prefetch:
+
   #redis配置
 
   redis:
@@ -45,7 +67,7 @@ spring:
     #    链接密码
     password: ee.148639
     #    链接超时时间（毫秒）
-    timeout:
+    timeout: 5000
     #    链接池
     jedis:
       pool:

@@ -11,6 +11,11 @@ public class GenerateLinkUtil {
     private static final String CHECK_CODE = "dsjs";
     private static final String SEND_TIME_KEY = "jgssd";
     private static final String USER_EMAIL_KEY = "cfyad";
+    private static final String USER_ID = "uid";
+
+    public static String getUserId() {
+        return USER_ID;
+    }
 
     public GenerateLinkUtil() {
     }
@@ -32,7 +37,7 @@ public class GenerateLinkUtil {
     }
 
     public static String generateActivateLink(UserInfo user) {
-        return "http://193.112.79.70:8080/sturegion/user/active?yuercd=" + user.getUserName() + "&" + "dsjs" + "=" + generateCheckcode(user) + "&" + "jgssd" + "=" + System.currentTimeMillis();
+        return "http://193.112.79.70:8080/sturegion/user/active?yuercd=" + user.getUserName() + "&" + USER_ID + "=" + user.getUserId() +"&" + CHECK_CODE + "=" + generateCheckcode(user) + "&" + SEND_TIME_KEY + "=" + System.currentTimeMillis();
     }
 
     public static String generateActivateLink(String email) {
